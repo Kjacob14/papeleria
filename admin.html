@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Panel Administrativo - Papelería El Profe</title>
+  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    /* Ajustes específicos del panel admin */
+    body {
+      background: linear-gradient(180deg, #fccdf7 0%, #fccdf7 100%);
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+    .admin-main {
+      flex: 1;
+      padding: 40px 20px;
+      max-width: 1200px;
+      margin: 0 auto;
+      width: 100%;
+    }
+    .admin-card {
+      background: #fff;
+      border-radius: 14px;
+      box-shadow: 0 4px 20px rgba(74, 15, 134, 0.1);
+      padding: 28px;
+      margin-bottom: 30px;
+    }
+    .admin-card h2 {
+      margin: 0 0 20px;
+      color: var(--accent-dark);
+    }
+    #loginSection {
+      max-width: 420px;
+      margin: 60px auto 0;
+    }
+    #loginSection h2 {
+      text-align: center;
+      margin-bottom: 22px;
+      color: var(--accent-dark);
+    }
+    #loginSection input {
+      width: 100%;
+      padding: 11px 14px;
+      margin-bottom: 14px;
+      border-radius: 8px;
+      border: 1.5px solid #e0d0f0;
+      font-family: 'Quicksand', sans-serif;
+      font-size: 14px;
+      outline: none;
+      transition: border-color .2s;
+    }
+    #loginSection input:focus { border-color: var(--accent-dark); }
+    #loginMsg { text-align: center; margin-top: 12px; color: #d9534f; font-weight: 600; }
+    table { width: 100%; border-collapse: collapse; }
+    thead tr { background: var(--accent-dark); color: #fff; }
+    th, td { padding: 12px 14px; text-align: left; border-bottom: 1px solid #f0e8fb; }
+    tbody tr:hover { background: #fdf4ff; }
+    #ordersList > div:last-child { border-bottom: none; }
+  </style>
+</head>
+<body>
+
+  <header class="navbar" style="background: linear-gradient(90deg, var(--accent-dark), #7b1fa2);">
+    <div class="brand">
+      <div class="logo" style="background: #fff; overflow:hidden;">
+        <img src="papeleria.jpeg" alt="Logo" style="width:100%; height:100%; object-fit:cover; border-radius:12px;">
+      </div>
+      <div>
+        <div style="font-weight:800; color:#fff; font-size:17px;">Gestión de Tienda</div>
+        <div style="font-size:12px; color:rgba(255,255,255,0.75);">Papelería El Profe — Admin</div>
+      </div>
+    </div>
+    <nav class="nav-right">
+      <button id="btnLogout" class="btn danger" style="display:none;" onclick="logoutAdmin()">Cerrar sesión</button>
+      <a href="index.php" class="btn secondary" style="text-decoration:none;">Ver Tienda</a>
+    </nav>
+  </header>
+
+  <div class="admin-main">
+
+    <!-- LOGIN -->
+    <div id="loginSection" class="admin-card">
+      <h2>🔐 Acceso Restringido</h2>
+      <input id="loginUser" type="email" placeholder="Correo electrónico" />
+      <input id="loginPass" type="password" placeholder="Contraseña" />
+      <button class="btn" style="width:100%; padding:11px;" onclick="doAdminLogin()">Ingresar al Panel</button>
+      <p id="loginMsg" style="display:none;"></p>
+    </div>
+
+    <!-- DASHBOARD -->
+    <div id="dashboardSection" style="display:none;">
+
+      <div class="admin-card">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+          <h2 style="margin:0;">📦 Inventario de Productos</h2>
+          <button class="btn" onclick="openNewProductModal()">+ Nuevo producto</button>
+        </div>
+        <table id="adminProductsTable">
+          <thead>
+            <tr>
+              <th>Nombre</th>
+              <th>Precio</th>
+              <th>Stock</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+
+      <div class="admin-card">
+        <h2>🧾 Pedidos Registrados</h2>
+        <div id="ordersList">
+          <div style="color:#888;">Cargando pedidos...</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <footer style="text-align:center; padding:14px; background: linear-gradient(90deg,#f87c9f,#e86f9d); color:#fff; font-weight:700;">
+    © <span id="adminYear"></span> Papelería El Profe
+  </footer>
+
+  <!-- Modal edición producto -->
+  <div id="modalProductEdit" class="modal">
+    <h3 id="prodModalTitle">Nuevo producto</h3>
+    <input id="prodName"  type="text"   placeholder="Nombre del producto"  style="width:100%; padding:9px; margin-bottom:10px; border-radius:7px; border:1.5px solid #e0d0f0;"/>
+    <input id="prodPrice" type="number" placeholder="Precio"               style="width:100%; padding:9px; margin-bottom:10px; border-radius:7px; border:1.5px solid #e0d0f0;"/>
+    <input id="prodStock" type="number" placeholder="Cantidad disponible"  style="width:100%; padding:9px; margin-bottom:10px; border-radius:7px; border:1.5px solid #e0d0f0;"/>
+    <input id="prodImage" type="text"   placeholder="URL imagen"           style="width:100%; padding:9px; margin-bottom:16px; border-radius:7px; border:1.5px solid #e0d0f0;"/>
+    <div class="actions">
+      <button class="btn" onclick="saveProductFromModal()">Guardar</button>
+      <button class="btn btn-cancel" onclick="closeProductModal()">Cancelar</button>
+    </div>
+    <p id="prodModalMsg" style="text-align:center; margin-top:10px; color:#d9534f; font-weight:600;"></p>
+  </div>
+
+  <script>
+    document.getElementById('adminYear').textContent = new Date().getFullYear();
+  </script>
+  <script src="admin.js"></script>
+</body>
+</html>
