@@ -5,6 +5,16 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Panel Administrativo - Papelería El Profe</title>
   <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600;700&display=swap" rel="stylesheet">
+  <script>
+  (function () {
+    var guardado = localStorage.getItem('tema');
+    if (guardado === 'dark' || guardado === 'light') {
+      document.documentElement.setAttribute('data-theme', guardado);
+    }
+    // Si no hay preferencia guardada, no se setea nada: manda
+    // @media (prefers-color-scheme) definido en styles.css.
+  })();
+</script>
   <link rel="stylesheet" href="styles.css">
   <style>
     /* Ajustes específicos del panel admin */

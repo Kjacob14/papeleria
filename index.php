@@ -8,7 +8,16 @@
 <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
-
+<script>
+  (function () {
+    var guardado = localStorage.getItem('tema');
+    if (guardado === 'dark' || guardado === 'light') {
+      document.documentElement.setAttribute('data-theme', guardado);
+    }
+    // Si no hay preferencia guardada, no se setea nada: manda
+    // @media (prefers-color-scheme) definido en styles.css.
+  })();
+</script>
 <link rel="stylesheet" href="styles.css?v=2">
 </head>
 <body>
@@ -26,7 +35,14 @@
     <nav class="nav-right" id="adminPanelToggleContainer">
       <a href="#inicio">Inicio</a>
       <a href="#catalogo">Catálogo</a>
-      
+      <button
+        id="themeToggleBtn"
+        class="theme-toggle"
+         type="button"
+         aria-label="Cambiar a modo oscuro"
+         title="Cambiar tema"
+          onclick="toggleTema()"
+        >🌙</button>
       <a href="#mochilita" title="Ver Mochilita" aria-label="Ver mi mochilita, carrito de compras" style="display:flex; align-items:center; position:relative; text-decoration:none;">
         <img src="Mochila.png" alt="" id="nav-img-mochila" style="height: 28px; width: auto; transition: transform 0.3s ease;">
         <span id="cart-badge" aria-hidden="true" style="position:absolute; top:-6px; right:-10px; background:#d9534f; color:white; font-size:11px; font-weight:bold; padding:2px 6px; border-radius:10px; display:none; box-shadow:0 2px 4px rgba(0,0,0,0.2); z-index: 10;">0</span>
@@ -162,5 +178,29 @@
 <button class="voice-btn"   id="voiceBtn"   title="Asistente de voz" aria-label="Activar asistente de voz" aria-pressed="false">&#127908;</button>
 
 <script src="app.js"></script>
+<script>
+  function aplicarIconoTema() {
+    var btn = document.getElementById('themeToggleBtn');
+    if (!btn) return;
+    var esOscuro = document.documentElement.getAttribute('data-theme') === 'dark'
+      || (!document.documentElement.getAttribute('data-theme')
+          && window.matchMedia('(prefers-color-scheme: dark)').matches);
+    btn.textContent = esOscuro ? '☀️' : '🌙';
+    btn.setAttribute('aria-label', esOscuro ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro');
+  }
+ 
+  function toggleTema() {
+    var actual = document.documentElement.getAttribute('data-theme');
+    var esOscuroActual = actual === 'dark'
+      || (!actual && window.matchMedia('(prefers-color-scheme: dark)').matches);
+    var nuevo = esOscuroActual ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', nuevo);
+    localStorage.setItem('tema', nuevo);
+    aplicarIconoTema();
+  }
+ 
+  document.addEventListener('DOMContentLoaded', aplicarIconoTema);
+</script>
+
 </body>
 </html>
