@@ -132,22 +132,23 @@
 </div>
 
 <!-- Panel flotante del asistente -->
-<div id="assistantBox">
+<div id="assistantBox" role="dialog" aria-label="Asistente El Profe" aria-hidden="true">
   <div class="mini-header">
     <h4>🤖 Asistente El Profe</h4>
-    <button class="small-btn" id="assistantToggleBtn">Cerrar ✕</button>
+    <button class="small-btn" id="assistantToggleBtn" aria-label="Cerrar asistente">Cerrar ✕</button>
   </div>
-  <div id="assistantMessages" class="mini-body"></div>
+  <div id="assistantMessages" class="mini-body" role="log" aria-live="polite" aria-label="Conversación con el asistente"></div>
   <div id="assistantFooter" class="mini-footer">
-    <input type="text" id="assistantInput" placeholder="Escribe tu pregunta..." />
-    <button class="small-btn" id="assistantSendBtn">↑</button>
-    <button class="small-btn" id="assistantVoiceBtn">🎤</button>
+    <label for="assistantInput" class="sr-only">Escribe tu pregunta para el asistente</label>
+    <input type="text" id="assistantInput" placeholder="Escribe tu pregunta..." aria-label="Escribe tu pregunta" />
+    <button class="small-btn" id="assistantSendBtn" aria-label="Enviar pregunta">↑</button>
+    <button class="small-btn" id="assistantVoiceBtn" aria-label="Activar entrada de voz" aria-pressed="false">🎤</button>
   </div>
 </div>
 
 <!-- Botones flotantes -->
-<button class="chatbot-btn" id="chatbotBtn" title="Abrir asistente">&#128172;</button>
-<button class="voice-btn"   id="voiceBtn"   title="Asistente de voz">&#127908;</button>
+<button class="chatbot-btn" id="chatbotBtn" title="Abrir asistente" aria-label="Abrir asistente virtual" aria-haspopup="dialog" aria-expanded="false" aria-controls="assistantBox">&#128172;</button>
+<button class="voice-btn"   id="voiceBtn"   title="Asistente de voz" aria-label="Activar asistente de voz" aria-pressed="false">&#127908;</button>
 
 <script src="app.js"></script>
 </body>

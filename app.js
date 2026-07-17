@@ -271,10 +271,10 @@ function renderCart() {
 }
 
 /* ── COMBOS ──────────────────────────────────────────────── */
-function agregarCombo(nombre, precio) {
-  const existe = cart.find(i => i.nombre === nombre);
+function agregarCombo(id, nombre, precio) {
+  const existe = cart.find(i => i.id === id && i.tipo === 'Combo');
   if (existe) existe.cantidad += 1;
-  else cart.push({ nombre, precio: Number(precio), cantidad: 1, tipo: 'Combo' });
+  else cart.push({ id, nombre, precio: Number(precio), cantidad: 1, tipo: 'Combo' });
   actualizarBadgeMochilita();
   showToast(`¡${nombre} agregado a tu mochilita! 🎒`);
 }
@@ -291,7 +291,7 @@ function buildComboCard(c) {
       <p style="font-size:13px;color:#555;padding:0 10px;">${escapeHtml(c.descripcion)}</p>
       <div class="price" style="font-size:18px;margin:8px 0;">$${Number(c.precio).toFixed(2)}</div>
       <div class="actions">
-        <button class="btn" onclick="agregarCombo('${escapeHtml(c.nombre)}',${c.precio})">Agregar a Mochilita</button>
+        <button class="btn" onclick="agregarCombo(${c.id},'${escapeHtml(c.nombre)}',${c.precio})">Agregar a Mochilita</button>
       </div>
     </div>`;
 }
@@ -344,9 +344,9 @@ function confirmAddQuantity() {
     showToast(`Solo hay ${p.stock} unidades disponibles.`); return;
   }
 
-  const existe = cart.find(i => i.nombre === p.nombre && i.tipo === '');
+  const existe = cart.find(i => i.id === p.id && i.tipo === '');
   if (existe) existe.cantidad += cantidad;
-  else cart.push({ nombre: p.nombre, precio: Number(p.precio), cantidad, tipo: '' });
+  else cart.push({ id: p.id, nombre: p.nombre, precio: Number(p.precio), cantidad, tipo: '' });
 
   p.stock -= cantidad;
   renderCatalog();
@@ -357,7 +357,7 @@ function confirmAddQuantity() {
 
 function removeItem(index) {
   const item    = cart[index];
-  const product = products.find(p => p.nombre === item.nombre);
+  const product = products.find(p => p.id === item.id);
   if (product && item.tipo !== 'Combo') product.stock += item.cantidad;
   cart.splice(index, 1);
   renderCatalog();
@@ -367,7 +367,7 @@ function removeItem(index) {
 
 function changeQuantity(index, delta) {
   const item    = cart[index];
-  const product = products.find(p => p.nombre === item.nombre);
+  const product = products.find(p => p.id === item.id);
 
   if (delta > 0 && product && product.stock <= 0 && item.tipo !== 'Combo') {
     showToast(`Ya no hay más unidades de ${item.nombre}.`); return;
@@ -609,9 +609,9 @@ function setupSpeechRecognition() {
   recognition.interimResults = false;
   recognition.maxAlternatives = 1;
 
-  recognition.onstart  = () => { recognizing = true;  document.getElementById('assistantVoiceBtn').textContent = '🎙️...'; };
-  recognition.onend    = () => { recognizing = false; document.getElementById('assistantVoiceBtn').textContent = '🎤'; };
-  recognition.onerror  = ()  => { recognizing = false; document.getElementById('assistantVoiceBtn').textContent = '🎤'; };
+  recognition.onstart  = () => { recognizing = true;  const b = document.getElementById('assistantVoiceBtn'); b.textContent = '🎙️...'; b.setAttribute('aria-pressed', 'true'); };
+  recognition.onend    = () => { recognizing = false; const b = document.getElementById('assistantVoiceBtn'); b.textContent = '🎤'; b.setAttribute('aria-pressed', 'false'); };
+  recognition.onerror  = ()  => { recognizing = false; const b = document.getElementById('assistantVoiceBtn'); b.textContent = '🎤'; b.setAttribute('aria-pressed', 'false'); };
   recognition.onresult = ev  => {
     const t = (ev.results[0][0].transcript || '').trim();
     addAssistantUserMessage(t);
@@ -659,9 +659,9 @@ function processAssistantMessage(msg) {
       const r = `No quedan unidades de ${prod.nombre}`;
       addAssistantBotMessage(r); speakText(r); return;
     }
-    const existe = cart.find(i => i.nombre === prod.nombre);
+    const existe = cart.find(i => i.id === prod.id && i.tipo === '');
     if (existe) existe.cantidad += cant;
-    else cart.push({ nombre: prod.nombre, precio: prod.precio, cantidad: cant, tipo: '' });
+    else cart.push({ id: prod.id, nombre: prod.nombre, precio: prod.precio, cantidad: cant, tipo: '' });
     prod.stock -= cant;
     renderCatalog(); renderCart();
     const r = `${cant} ${prod.nombre} agregado(s) a tu mochilita`;
@@ -703,23 +703,33 @@ function processAssistantMessage(msg) {
 /* ── SETUP ───────────────────────────────────────────────── */
 function setupFloatingButtons() {
   document.getElementById('chatbotBtn').addEventListener('click', () => {
-    const box = document.getElementById('assistantBox');
+    const box  = document.getElementById('assistantBox');
+    const btn  = document.getElementById('chatbotBtn');
     const visible = box.style.display === 'flex';
     box.style.display = visible ? 'none' : 'flex';
+    box.setAttribute('aria-hidden', String(visible));
+    btn.setAttribute('aria-expanded', String(!visible));
     if (!visible) document.getElementById('assistantInput').focus();
   });
 
   document.getElementById('voiceBtn').addEventListener('click', () => {
-    document.getElementById('assistantBox').style.display = 'flex';
+    const box = document.getElementById('assistantBox');
+    box.style.display = 'flex';
+    box.setAttribute('aria-hidden', 'false');
+    document.getElementById('chatbotBtn').setAttribute('aria-expanded', 'true');
+    const voiceBtn = document.getElementById('voiceBtn');
     if (!recognition) { addAssistantBotMessage('Tu navegador no soporta reconocimiento de voz.'); return; }
-    if (recognizing) { recognition.stop(); showToast('Grabación detenida'); }
-    else             { recognition.start(); showToast('Escuchando... 🎤'); }
+    if (recognizing) { recognition.stop(); voiceBtn.setAttribute('aria-pressed', 'false'); showToast('Grabación detenida'); }
+    else             { recognition.start(); voiceBtn.setAttribute('aria-pressed', 'true'); showToast('Escuchando... 🎤'); }
   });
 }
 
 function setupAssistantBox() {
   document.getElementById('assistantToggleBtn').addEventListener('click', () => {
-    document.getElementById('assistantBox').style.display = 'none';
+    const box = document.getElementById('assistantBox');
+    box.style.display = 'none';
+    box.setAttribute('aria-hidden', 'true');
+    document.getElementById('chatbotBtn').setAttribute('aria-expanded', 'false');
   });
   document.getElementById('assistantVoiceBtn').addEventListener('click', () => {
     if (!recognition) { addAssistantBotMessage('Sin soporte de voz.'); return; }
