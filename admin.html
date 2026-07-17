@@ -81,8 +81,15 @@
 
   <div class="admin-main">
 
+    <!-- ESTADO DE CARGA: se muestra mientras se verifica si ya hay
+         sesión de admin activa, para no parpadear el login antes de
+         saltar al dashboard. -->
+    <div id="checkingSession" class="admin-card" style="max-width:420px; margin:60px auto 0; text-align:center; color:#888;">
+      Verificando sesión...
+    </div>
+
     <!-- LOGIN -->
-    <div id="loginSection" class="admin-card">
+    <div id="loginSection" class="admin-card" style="display:none;">
       <h2>🔐 Acceso Restringido</h2>
       <input id="loginUser" type="email" placeholder="Correo electrónico" />
       <input id="loginPass" type="password" placeholder="Contraseña" />

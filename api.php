@@ -50,6 +50,7 @@ $moduloPorAccion = [
   'logout'            => 'auth',
   'crear_cuenta'      => 'auth',
   'recuperar'         => 'auth',
+  'verificar_sesion'  => 'auth',
 ];
 
 if (!isset($moduloPorAccion[$action])) {

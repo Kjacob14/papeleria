@@ -51,6 +51,19 @@ switch ($action) {
     responderOk();
     break;
 
+  case 'verificar_sesion':
+    // Permite a admin.html saber si ya hay una sesión de admin activa
+    // (por ejemplo, si el usuario acaba de iniciar sesión desde la
+    // tienda pública) sin pedirle que vuelva a escribir sus
+    // credenciales. No requiere body ni valida contraseña: solo lee
+    // el estado de sesión que auth.php ya gestiona en 'login'.
+    if (!empty($_SESSION['admin_logged_in'])) {
+      responderOk(['sesionActiva' => true]);
+    } else {
+      responderOk(['sesionActiva' => false]);
+    }
+    break;
+
   case 'crear_cuenta':
     requireFields($body, ['nombre', 'correo', 'contrasena']);
     $n = trim($body['nombre']);

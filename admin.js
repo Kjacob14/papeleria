@@ -70,10 +70,37 @@ async function doAdminLogin() {
 
 async function logoutAdmin() {
   await apiPost('logout', {}).catch(() => {});
-  document.getElementById('loginSection').style.display     = 'block';
-  document.getElementById('dashboardSection').style.display = 'none';
-  document.getElementById('btnLogout').style.display        = 'none';
-  document.getElementById('loginPass').value                = '';
+  window.location.href = 'index.php';
+}
+
+/**
+ * Fase 5: evita el doble inicio de sesión. Antes, un admin que ya
+ * había iniciado sesión desde la tienda pública (index.php) era
+ * redirigido a admin.html, pero esta página siempre mostraba el
+ * formulario de login sin verificar si ya existía una sesión activa
+ * en el servidor — obligando a escribir las credenciales dos veces.
+ *
+ * Ahora, al cargar admin.html, se pregunta primero al backend
+ * (verificar_sesion) si ya hay sesión de admin activa. Si la hay, se
+ * salta directo al dashboard; si no, se muestra el login normal.
+ */
+async function verificarSesionActiva() {
+  try {
+    const data = await apiGet('verificar_sesion');
+    if (data.ok && data.sesionActiva) {
+      document.getElementById('dashboardSection').style.display = 'block';
+      document.getElementById('btnLogout').style.display        = 'inline-block';
+      loadDashboardData();
+    } else {
+      document.getElementById('loginSection').style.display = 'block';
+    }
+  } catch (e) {
+    // Fallo de conexión genuino: se cae al login normal, sin bloquear
+    // el acceso a la página.
+    document.getElementById('loginSection').style.display = 'block';
+  } finally {
+    document.getElementById('checkingSession').style.display = 'none';
+  }
 }
 
 /* ── CARGA DE DATOS ──────────────────────────────────────── */
@@ -206,3 +233,6 @@ function renderOrdersList() {
     div.appendChild(el);
   });
 }
+
+/* ── INICIALIZACIÓN ──────────────────────────────────────── */
+document.addEventListener('DOMContentLoaded', verificarSesionActiva);
