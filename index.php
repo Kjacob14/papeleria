@@ -19,7 +19,7 @@
       <img src="papeleria.jpeg" alt="Logo Papelería El Profe" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
     </div>
       <div>
-        <div style="font-weight:800;color:var(--accent)">Papelería</div>
+        <div style="font-weight:800;color:#000">Papelería</div>
         <div style="font-size:12px;color:rgb(1, 1, 2)">Útiles escolares y Material de oficina</div>
       </div>
     </div>

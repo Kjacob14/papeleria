@@ -3,14 +3,17 @@
 ============================================================ */
 
 :root {
-    --accent: #000000;
-    --accent-dark: #4a0f86;
-    --muted: #050601;
-    --card: #feefcb;
-    --toast-bg: rgba(1, 3, 4, 0.9);
-    --bg-pink: #fccdf7;
+    /* Paleta "Papelería El Profe" — modo claro.
+       Modo oscuro queda pendiente para una fase futura. */
+    --bg-pink: #F8FAFC;        /* Fondo general — Gris Lienzo */
+    --card: #FFFFFF;           /* Tarjetas de producto — Blanco Puro */
+    --accent: #F43F5E;         /* CTA "Agregar al Carrito" — Rosa Coral */
+    --accent-dark: #1E293B;    /* Textos principales y títulos */
+    --border-soft: #E2E8F0;    /* Detalles y líneas de división — Gris Suave */
+    --muted: #1E293B;
+    --toast-bg: rgba(30, 41, 59, 0.92);
     /* Variables de diseño mejorado */
-    --card-glass: rgba(255, 255, 255, 0.7);
+    --card-glass: rgba(255, 255, 255, 0.85);
     --shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
 }
 
@@ -69,7 +72,7 @@ header.navbar {
     align-items: center;
     justify-content: center;
     font-weight: 700;
-    color: var(--accent);
+    color: var(--accent-dark);
     box-shadow: 0 6px 18px rgba(3, 105, 161, 0.06);
     overflow: hidden;
 }
@@ -80,8 +83,31 @@ header.navbar {
 .nav-right input { padding: 6px 10px; border-radius: 8px; border: 1.5px solid #ddd; outline: none; font-size: 14px; }
 .nav-right button { border: none; padding: 6px 14px; border-radius: 8px; cursor: pointer; }
 
-/* --- Botones --- */
+/* --- Botones ---
+   Nota de paleta: el Rosa Coral (--accent) queda reservado para los
+   CTA de compra ("Agregar", "Confirmar Pedido", etc. — clase .btn-cta
+   o .btn dentro de tarjetas de producto/carrito). El botón genérico
+   .btn usa el azul pizarra (--accent-dark) para no competir visualmente
+   con el CTA de compra. */
 .btn {
+    padding: 8px 12px;
+    border-radius: 10px;
+    border: none;
+    background: var(--accent-dark);
+    color: #ffffff;
+    cursor: pointer;
+    font-weight: 700;
+    transition: all 0.2s ease;
+}
+.btn:hover { opacity: 0.9; transform: translateY(-2px); }
+.btn:active { transform: scale(0.95); }
+.btn.secondary { background: #fff; color: var(--accent-dark); border: 1px solid var(--border-soft); }
+.btn.danger { background: #d9534f; color: #fff; }
+.btn:disabled { background: #ccc !important; color: #666 !important; cursor: not-allowed; opacity: 0.7; }
+
+/* CTA de compra — Rosa Coral, uso exclusivo para "Agregar al Carrito",
+   "Confirmar Pedido" y acciones de compra equivalentes. */
+.btn-cta {
     padding: 8px 12px;
     border-radius: 10px;
     border: none;
@@ -91,14 +117,12 @@ header.navbar {
     font-weight: 700;
     transition: all 0.2s ease;
 }
-.btn:hover { opacity: 0.9; transform: translateY(-2px); }
-.btn:active { transform: scale(0.95); }
-.btn.secondary { background: #fff; color: var(--accent); border: 1px solid #ddd; }
-.btn.danger { background: #d9534f; color: #fff; }
-.btn:disabled { background: #ccc !important; color: #666 !important; cursor: not-allowed; opacity: 0.7; }
+.btn-cta:hover { opacity: 0.9; transform: translateY(-2px); }
+.btn-cta:active { transform: scale(0.95); }
+.btn-cta:disabled { background: #ccc !important; color: #666 !important; cursor: not-allowed; opacity: 0.7; }
 
 /* --- Hero --- */
-.hero { padding: 50px 20px; text-align: center; background: linear-gradient(135deg, var(--bg-pink), #f897f6); }
+.hero { padding: 50px 20px; text-align: center; background: linear-gradient(135deg, #FCE7EC, #FFFFFF); border-bottom: 1px solid var(--border-soft); }
 .hero h1 { margin: 6px 0; font-size: 42px; color: var(--accent-dark); }
 .hero p { margin: 10px 0; font-weight: 600; }
 
@@ -115,7 +139,7 @@ header.navbar {
 .item {
     background: var(--card-glass);
     backdrop-filter: blur(5px);
-    border: 1px solid rgba(255, 255, 255, 0.5);
+    border: 1px solid var(--border-soft);
     border-radius: 20px;
     padding: 15px;
     text-align: center;
@@ -129,7 +153,7 @@ header.navbar {
 }
 .item:hover { transform: translateY(-5px); box-shadow: 0 15px 30px rgba(0,0,0,0.1); }
 .thumb { width: 100%; height: 180px; object-fit: cover; border-radius: 12px; background: #eee; cursor: pointer; }
-.item h3 { margin: 10px 0; font-size: 15px; color: #000; }
+.item h3 { margin: 10px 0; font-size: 15px; color: var(--accent-dark); }
 .price { font-weight: 800; color: #c47317; font-size: 18px; }
 .item .actions { display: flex; gap: 8px; margin-top: auto; width: 100%; justify-content: center; }
 
