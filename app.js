@@ -7,10 +7,33 @@ emailjs.init("Rz7f3kZkPxlwT1bL0");
 /* ── Helpers de API ──────────────────────────────────────── */
 const API = 'api.php';
 
+/**
+ * Fase 3: el backend ahora responde con códigos HTTP reales (400,
+ * 401, 404, 409, etc.) además del 200. Antes, cualquier código
+ * distinto de 2xx hacía throw sin leer el cuerpo, así que mensajes
+ * como "Correo o contraseña incorrectos" nunca llegaban a mostrarse
+ * (el usuario solo veía "Error de conexión con el servidor").
+ *
+ * Ahora: siempre se intenta leer el JSON de la respuesta, sin
+ * importar el código HTTP. El JSON del backend siempre trae
+ * { ok: true/false, error?: '...' }, así que quien llama a apiGet/
+ * apiPost puede seguir revisando data.ok / data.error exactamente
+ * igual que antes.
+ *
+ * Solo se lanza una excepción real (catch) cuando la respuesta NO
+ * se puede interpretar como JSON — eso sí es un fallo de conexión
+ * genuino (servidor caído, XAMPP apagado, etc.), no un error de
+ * validación esperado.
+ */
 async function apiGet(action) {
   const res = await fetch(`${API}?action=${action}`);
-  if (!res.ok) throw new Error(`HTTP ${res.status}`);
-  return res.json();
+  let data;
+  try {
+    data = await res.json();
+  } catch (e) {
+    throw new Error(`HTTP ${res.status}`);
+  }
+  return data;
 }
 
 async function apiPost(action, data) {
@@ -19,8 +42,13 @@ async function apiPost(action, data) {
     headers: { 'Content-Type': 'application/json' },
     body:    JSON.stringify(data),
   });
-  if (!res.ok) throw new Error(`HTTP ${res.status}`);
-  return res.json();
+  let json;
+  try {
+    json = await res.json();
+  } catch (e) {
+    throw new Error(`HTTP ${res.status}`);
+  }
+  return json;
 }
 
 /* ── Carga de datos ──────────────────────────────────────── */
@@ -409,7 +437,23 @@ async function finishTicketWithoutEmail() {
   const total = cart.reduce((s, i) => s + i.precio * i.cantidad, 0).toFixed(2);
   const order = { id, fecha: new Date().toLocaleString(), items, total, correo: '', carrito: cart };
 
-  try { await apiPost('guardar_pedido', order); } catch(e) { console.warn('Error guardando pedido:', e); }
+  // Fase 3: el backend ahora valida stock y precios estrictamente y
+  // puede rechazar el pedido (ej. alguien más compró el último
+  // artículo mientras estaba en el carrito). Antes esto casi no se
+  // detectaba; ahora hay que revisar data.ok en vez de asumir éxito.
+  let data;
+  try {
+    data = await apiPost('guardar_pedido', order);
+  } catch (e) {
+    console.warn('Error de conexión guardando pedido:', e);
+    showToast('⚠️ No se pudo conectar con el servidor. Intenta de nuevo.');
+    return;
+  }
+
+  if (!data.ok) {
+    showToast(`⚠️ No se pudo registrar el pedido: ${data.error || 'error desconocido'}`);
+    return;
+  }
 
   showToast('Pedido registrado con éxito');
   cart = [];
@@ -443,7 +487,29 @@ async function sendTicketByEmail() {
   const items = cart.map(i => `${i.nombre} x${i.cantidad} - $${(i.precio*i.cantidad).toFixed(2)}`).join('; ');
   const order = { id, fecha: new Date().toLocaleString(), items, total: total.toFixed(2), correo, carrito: cart };
 
-  try { await apiPost('guardar_pedido', order); } catch(e) { console.warn('Error guardando pedido:', e); }
+  // Fase 3: mismo cuidado que en finishTicketWithoutEmail — el correo
+  // ya se envió (o se intentó) arriba, pero el pedido en sí puede ser
+  // rechazado por el backend (stock insuficiente, producto eliminado,
+  // etc.). Se informa al usuario en vez de asumir éxito silencioso.
+  let data;
+  try {
+    data = await apiPost('guardar_pedido', order);
+  } catch (e) {
+    console.warn('Error de conexión guardando pedido:', e);
+    showToast('⚠️ Ticket enviado, pero no se pudo conectar con el servidor para registrar el pedido.');
+    cart = [];
+    hideModal('modalTicket');
+    renderCart();
+    return;
+  }
+
+  if (!data.ok) {
+    showToast(`⚠️ Ticket enviado, pero el pedido no se pudo registrar: ${data.error || 'error desconocido'}`);
+    cart = [];
+    hideModal('modalTicket');
+    renderCart();
+    return;
+  }
 
   cart = [];
   hideModal('modalTicket');

@@ -3,10 +3,23 @@ let products = [];
 let orders = [];
 let editingProductIndex = null;
 
+/**
+ * Fase 3: el backend responde con códigos HTTP reales (400, 401, 404,
+ * 409, etc.), no solo 200/500. Antes, cualquier código distinto de
+ * 2xx hacía throw sin leer el cuerpo, así que mensajes de error como
+ * "Producto no encontrado" nunca llegaban a mostrarse en el panel.
+ * Ahora siempre se intenta leer el JSON (que siempre trae
+ * { ok, error? }), sin importar el código HTTP. Solo se lanza una
+ * excepción real si la respuesta no es JSON válido (fallo de
+ * conexión genuino).
+ */
 async function apiGet(action) {
   const res = await fetch(`${API}?action=${action}`);
-  if (!res.ok) throw new Error(`HTTP ${res.status}`);
-  return res.json();
+  try {
+    return await res.json();
+  } catch (e) {
+    throw new Error(`HTTP ${res.status}`);
+  }
 }
 
 async function apiPost(action, data) {
@@ -15,8 +28,11 @@ async function apiPost(action, data) {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(data),
   });
-  if (!res.ok) throw new Error(`HTTP ${res.status}`);
-  return res.json();
+  try {
+    return await res.json();
+  } catch (e) {
+    throw new Error(`HTTP ${res.status}`);
+  }
 }
 
 /* ── AUTENTICACIÓN ───────────────────────────────────────── */
@@ -113,17 +129,29 @@ async function saveProductFromModal() {
     if (editingProductIndex !== null) {
       const p = products[editingProductIndex];
       const payload = { id: p.id, nombre: name, precio: price, stock: stock, imagen: img, variantes: p.variantes };
-      await apiPost('editar_producto', payload);
+      const res = await apiPost('editar_producto', payload);
+      // Fase 3: el backend ahora valida (producto existente, precio
+      // válido, etc.) y puede rechazar la edición. Antes se asumía
+      // éxito siempre; ahora se revisa res.ok antes de actualizar
+      // el estado local, para no desincronizar la tabla del admin.
+      if (!res.ok) {
+        msg.textContent = res.error || 'Error al guardar los cambios';
+        return;
+      }
       products[editingProductIndex] = payload;
     } else {
       const payload = { nombre: name, precio: price, stock: stock, imagen: img };
       const res = await apiPost('agregar_producto', payload);
-      if (res.ok) products.unshift({ id: res.id, ...payload });
+      if (!res.ok) {
+        msg.textContent = res.error || 'Error al registrar el producto';
+        return;
+      }
+      products.unshift({ id: res.id, ...payload });
     }
     renderAdminProductsTable();
     closeProductModal();
   } catch (e) {
-    msg.textContent = 'Error al guardar';
+    msg.textContent = 'Error de conexión al guardar';
   }
 }
 
@@ -131,11 +159,15 @@ async function deleteProduct(index) {
   const p = products[index];
   if (!confirm(`¿Eliminar "${p.nombre}"?`)) return;
   try {
-    await apiPost('eliminar_producto', { id: p.id });
+    const res = await apiPost('eliminar_producto', { id: p.id });
+    if (!res.ok) {
+      alert(res.error || 'No se pudo eliminar el producto');
+      return;
+    }
     products.splice(index, 1);
     renderAdminProductsTable();
   } catch (e) {
-    alert('Error al eliminar producto');
+    alert('Error de conexión al eliminar producto');
   }
 }
 
