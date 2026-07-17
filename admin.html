@@ -53,7 +53,7 @@
       transition: border-color .2s;
     }
     #loginSection input:focus { border-color: var(--accent-dark); }
-    #loginMsg { text-align: center; margin-top: 12px; color: #d9534f; font-weight: 600; }
+    #loginMsg { text-align: center; margin-top: 12px; color: #c9302c; font-weight: 600; }
     table { width: 100%; border-collapse: collapse; }
     thead tr { background: var(--accent-dark); color: #fff; }
     th, td { padding: 12px 14px; text-align: left; border-bottom: 1px solid #f0e8fb; }
@@ -91,10 +91,12 @@
     <!-- LOGIN -->
     <div id="loginSection" class="admin-card" style="display:none;">
       <h2>🔐 Acceso Restringido</h2>
+      <label for="loginUser" class="sr-only">Correo electrónico</label>
       <input id="loginUser" type="email" placeholder="Correo electrónico" />
+      <label for="loginPass" class="sr-only">Contraseña</label>
       <input id="loginPass" type="password" placeholder="Contraseña" />
       <button class="btn" style="width:100%; padding:11px;" onclick="doAdminLogin()">Ingresar al Panel</button>
-      <p id="loginMsg" style="display:none;"></p>
+      <p id="loginMsg" style="display:none;" role="alert"></p>
     </div>
 
     <!-- DASHBOARD -->
@@ -106,12 +108,13 @@
           <button class="btn" onclick="openNewProductModal()">+ Nuevo producto</button>
         </div>
         <table id="adminProductsTable">
+          <caption class="sr-only">Inventario de productos, con precio, stock y acciones disponibles</caption>
           <thead>
             <tr>
-              <th>Nombre</th>
-              <th>Precio</th>
-              <th>Stock</th>
-              <th>Acciones</th>
+              <th scope="col">Nombre</th>
+              <th scope="col">Precio</th>
+              <th scope="col">Stock</th>
+              <th scope="col">Acciones</th>
             </tr>
           </thead>
           <tbody></tbody>
@@ -133,17 +136,21 @@
   </footer>
 
   <!-- Modal edición producto -->
-  <div id="modalProductEdit" class="modal">
+  <div id="modalProductEdit" class="modal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="prodModalTitle">
     <h3 id="prodModalTitle">Nuevo producto</h3>
+    <label for="prodName" class="sr-only">Nombre del producto</label>
     <input id="prodName"  type="text"   placeholder="Nombre del producto"  style="width:100%; padding:9px; margin-bottom:10px; border-radius:7px; border:1.5px solid #e0d0f0;"/>
+    <label for="prodPrice" class="sr-only">Precio</label>
     <input id="prodPrice" type="number" placeholder="Precio"               style="width:100%; padding:9px; margin-bottom:10px; border-radius:7px; border:1.5px solid #e0d0f0;"/>
+    <label for="prodStock" class="sr-only">Cantidad disponible</label>
     <input id="prodStock" type="number" placeholder="Cantidad disponible"  style="width:100%; padding:9px; margin-bottom:10px; border-radius:7px; border:1.5px solid #e0d0f0;"/>
+    <label for="prodImage" class="sr-only">URL de la imagen</label>
     <input id="prodImage" type="text"   placeholder="URL imagen"           style="width:100%; padding:9px; margin-bottom:16px; border-radius:7px; border:1.5px solid #e0d0f0;"/>
     <div class="actions">
       <button class="btn" onclick="saveProductFromModal()">Guardar</button>
       <button class="btn btn-cancel" onclick="closeProductModal()">Cancelar</button>
     </div>
-    <p id="prodModalMsg" style="text-align:center; margin-top:10px; color:#d9534f; font-weight:600;"></p>
+    <p id="prodModalMsg" role="alert" style="text-align:center; margin-top:10px; color:#c9302c; font-weight:600;"></p>
   </div>
 
   <script>

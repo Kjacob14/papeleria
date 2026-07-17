@@ -4,6 +4,17 @@ let orders = [];
 let editingProductIndex = null;
 
 /**
+ * Fase 6: escapa texto antes de insertarlo vía innerHTML (nombres de
+ * producto, correos de pedidos). admin.js no comparte módulo con
+ * app.js, así que se define aquí una copia equivalente de la función
+ * que app.js ya usa para el mismo propósito.
+ */
+function escapeHtmlAdmin(s) {
+  return String(s || '').replace(/[&<>"']/g, m =>
+    ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[m]));
+}
+
+/**
  * Fase 3: el backend responde con códigos HTTP reales (400, 401, 404,
  * 409, etc.), no solo 200/500. Antes, cualquier código distinto de
  * 2xx hacía throw sin leer el cuerpo, así que mensajes de error como
@@ -85,21 +96,31 @@ async function logoutAdmin() {
  * salta directo al dashboard; si no, se muestra el login normal.
  */
 async function verificarSesionActiva() {
+  const login     = document.getElementById('loginSection');
+  const dashboard = document.getElementById('dashboardSection');
+  const checking  = document.getElementById('checkingSession');
+  const btnLogout = document.getElementById('btnLogout');
+
   try {
     const data = await apiGet('verificar_sesion');
     if (data.ok && data.sesionActiva) {
-      document.getElementById('dashboardSection').style.display = 'block';
-      document.getElementById('btnLogout').style.display        = 'inline-block';
+      login.style.display     = 'none';
+      dashboard.style.display = 'block';
+      btnLogout.style.display = 'inline-block';
       loadDashboardData();
     } else {
-      document.getElementById('loginSection').style.display = 'block';
+      dashboard.style.display = 'none';
+      btnLogout.style.display = 'none';
+      login.style.display     = 'block';
     }
   } catch (e) {
     // Fallo de conexión genuino: se cae al login normal, sin bloquear
     // el acceso a la página.
-    document.getElementById('loginSection').style.display = 'block';
+    dashboard.style.display = 'none';
+    btnLogout.style.display = 'none';
+    login.style.display     = 'block';
   } finally {
-    document.getElementById('checkingSession').style.display = 'none';
+    checking.style.display = 'none';
   }
 }
 
@@ -115,6 +136,65 @@ async function loadDashboardData() {
   }
 }
 
+/* ── MODAL ACCESIBLE (equivalente al de app.js) ──────────────
+ * Fase 6: admin.js no comparte módulo con app.js, así que se replica
+ * aquí la misma lógica de foco/trampa de Tab/Escape para que
+ * modalProductEdit se comporte igual que los modales del sitio
+ * público.
+ */
+let elementoAntesDelModalAdmin = null;
+let modalActivoIdAdmin = null;
+
+function getFocusablesEnModalAdmin(modalEl) {
+  return Array.from(modalEl.querySelectorAll(
+    'a[href], button:not([disabled]), textarea:not([disabled]), input:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])'
+  )).filter(el => el.offsetParent !== null);
+}
+
+function manejarTeclaModalAdmin(e) {
+  if (!modalActivoIdAdmin) return;
+  const modal = document.getElementById(modalActivoIdAdmin);
+  if (!modal) return;
+
+  if (e.key === 'Escape') { e.preventDefault(); hideModalAdmin(modalActivoIdAdmin); return; }
+
+  if (e.key === 'Tab') {
+    const focusables = getFocusablesEnModalAdmin(modal);
+    if (focusables.length === 0) return;
+    const primero = focusables[0];
+    const ultimo  = focusables[focusables.length - 1];
+    if (e.shiftKey && document.activeElement === primero) { e.preventDefault(); ultimo.focus(); }
+    else if (!e.shiftKey && document.activeElement === ultimo) { e.preventDefault(); primero.focus(); }
+  }
+}
+
+function showModalAdmin(id) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  elementoAntesDelModalAdmin = document.activeElement;
+  modalActivoIdAdmin = id;
+  el.style.display = 'block';
+  el.setAttribute('aria-hidden', 'false');
+  const focusables = getFocusablesEnModalAdmin(el);
+  if (focusables.length > 0) focusables[0].focus();
+  document.addEventListener('keydown', manejarTeclaModalAdmin);
+}
+
+function hideModalAdmin(id) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.style.display = 'none';
+  el.setAttribute('aria-hidden', 'true');
+  if (modalActivoIdAdmin === id) {
+    document.removeEventListener('keydown', manejarTeclaModalAdmin);
+    modalActivoIdAdmin = null;
+    if (elementoAntesDelModalAdmin && typeof elementoAntesDelModalAdmin.focus === 'function') {
+      elementoAntesDelModalAdmin.focus();
+    }
+    elementoAntesDelModalAdmin = null;
+  }
+}
+
 /* ── CRUD DE PRODUCTOS ───────────────────────────────────── */
 function openNewProductModal() {
   editingProductIndex = null;
@@ -123,7 +203,7 @@ function openNewProductModal() {
   document.getElementById('prodPrice').value = '';
   document.getElementById('prodStock').value = '';
   document.getElementById('prodImage').value = '';
-  document.getElementById('modalProductEdit').style.display = 'block';
+  showModalAdmin('modalProductEdit');
 }
 
 function openEditProductModal(index) {
@@ -134,11 +214,11 @@ function openEditProductModal(index) {
   document.getElementById('prodPrice').value = p.precio;
   document.getElementById('prodStock').value = p.stock;
   document.getElementById('prodImage').value = p.imagen;
-  document.getElementById('modalProductEdit').style.display = 'block';
+  showModalAdmin('modalProductEdit');
 }
 
 function closeProductModal() {
-  document.getElementById('modalProductEdit').style.display = 'none';
+  hideModalAdmin('modalProductEdit');
 }
 
 async function saveProductFromModal() {
@@ -206,12 +286,12 @@ function renderAdminProductsTable() {
     const tr = document.createElement('tr');
     tr.style.borderBottom = '1px solid #eee';
     tr.innerHTML = `
-      <td style="padding:12px;">${p.nombre}</td>
+      <td style="padding:12px;">${escapeHtmlAdmin(p.nombre)}</td>
       <td style="padding:12px;">$${Number(p.precio).toFixed(2)}</td>
       <td style="padding:12px;">${p.stock}</td>
       <td style="padding:12px;">
-        <button class="btn" style="padding:6px 10px; font-size:12px;" onclick="openEditProductModal(${i})">Editar</button>
-        <button class="btn btn-cancel" style="padding:6px 10px; font-size:12px; background:#d9534f; color:white;" onclick="deleteProduct(${i})">Eliminar</button>
+        <button class="btn" style="padding:6px 10px; font-size:12px;" onclick="openEditProductModal(${i})" aria-label="Editar ${escapeHtmlAdmin(p.nombre)}">Editar</button>
+        <button class="btn btn-cancel" style="padding:6px 10px; font-size:12px; background:#c9302c; color:white;" onclick="deleteProduct(${i})" aria-label="Eliminar ${escapeHtmlAdmin(p.nombre)}">Eliminar</button>
       </td>`;
     tbody.appendChild(tr);
   });
@@ -227,9 +307,9 @@ function renderOrdersList() {
     const el = document.createElement('div');
     el.style.cssText = 'border-bottom:1px solid #f1f3f6; padding:12px 0;';
     el.innerHTML = `
-      <div style="font-weight:700; color:var(--accent-dark);">${o.id} <span style="font-weight:400; color:#666; font-size:13px;">(${o.fecha})</span></div>
-      <div style="font-size:14px; margin-top:6px; color:#444;">${o.items}</div>
-      <div style="margin-top:6px; font-weight:700; color:#222;">Total: $${Number(o.total).toFixed(2)} &bull; ${o.correo || 'Venta en mostrador'}</div>`;
+      <div style="font-weight:700; color:var(--accent-dark);">${escapeHtmlAdmin(o.id)} <span style="font-weight:400; color:#666; font-size:13px;">(${escapeHtmlAdmin(o.fecha)})</span></div>
+      <div style="font-size:14px; margin-top:6px; color:#444;">${escapeHtmlAdmin(o.items)}</div>
+      <div style="margin-top:6px; font-weight:700; color:#222;">Total: $${Number(o.total).toFixed(2)} &bull; ${escapeHtmlAdmin(o.correo) || 'Venta en mostrador'}</div>`;
     div.appendChild(el);
   });
 }

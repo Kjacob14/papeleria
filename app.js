@@ -149,12 +149,12 @@ async function ejecutarRegistroPublico() {
         }
       }, 1200);
     } else {
-      msg.style.color = '#d9534f';
+      msg.style.color = '#c9302c';
       msg.textContent = data.error || 'Error al crear la cuenta.';
       msg.style.display = 'block';
     }
   } catch (e) {
-    msg.style.color = '#d9534f';
+    msg.style.color = '#c9302c';
     msg.textContent = 'Error de conexión.';
     msg.style.display = 'block';
   }
@@ -281,7 +281,7 @@ function agregarCombo(id, nombre, precio) {
 
 function buildComboCard(c) {
   const etiquetaHTML = c.etiqueta
-    ? `<div style="position:absolute;top:-10px;right:-10px;background:#d9534f;color:#fff;padding:4px 10px;border-radius:12px;font-weight:bold;font-size:12px;box-shadow:0 2px 5px rgba(0,0,0,0.2);z-index:2;">${escapeHtml(c.etiqueta)}</div>`
+    ? `<div style="position:absolute;top:-10px;right:-10px;background:#c9302c;color:#fff;padding:4px 10px;border-radius:12px;font-weight:bold;font-size:12px;box-shadow:0 2px 5px rgba(0,0,0,0.2);z-index:2;">${escapeHtml(c.etiqueta)}</div>`
     : '';
   return `
     <div class="item" style="border:2px solid var(--accent);position:relative;background:#fff;flex:0 0 auto;width:280px;scroll-snap-align:center;">
@@ -519,58 +519,174 @@ async function sendTicketByEmail() {
 }
 
 /* ── CONFIRMAR PEDIDO ────────────────────────────────────── */
+/**
+ * Fase 6: estos dos diálogos se armaban con document.createElement
+ * fuera del sistema de modales — sin overlay, sin role="dialog", sin
+ * foco gestionado y sin cierre por Escape. crearDialogoFlotante()
+ * centraliza eso reutilizando la misma trampa de foco/Escape que ya
+ * usan showModal/hideModal, para que el comportamiento de teclado
+ * sea idéntico en todo el sitio.
+ */
+function crearDialogoFlotante(etiqueta, innerHTML) {
+  const overlay = document.createElement('div');
+  Object.assign(overlay.style, {
+    position: 'fixed', inset: '0', background: 'rgba(0,0,0,0.35)',
+    zIndex: '2000', display: 'flex', alignItems: 'center', justifyContent: 'center',
+  });
+
+  const box = document.createElement('div');
+  box.setAttribute('role', 'dialog');
+  box.setAttribute('aria-modal', 'true');
+  box.setAttribute('aria-label', etiqueta);
+  Object.assign(box.style, {
+    background: '#fff', padding: '25px', borderRadius: '12px',
+    boxShadow: '0 4px 20px rgba(0,0,0,0.3)', textAlign: 'center', maxWidth: '90%',
+  });
+  box.innerHTML = innerHTML;
+  overlay.appendChild(box);
+  document.body.appendChild(overlay);
+
+  const elementoPrevio = document.activeElement;
+  const focusables = getFocusablesEnModal(box);
+  if (focusables.length > 0) focusables[0].focus();
+
+  function manejarTecla(e) {
+    if (e.key === 'Escape') { e.preventDefault(); cerrar(); return; }
+    if (e.key === 'Tab') {
+      const f = getFocusablesEnModal(box);
+      if (f.length === 0) return;
+      const primero = f[0], ultimo = f[f.length - 1];
+      if (e.shiftKey && document.activeElement === primero) { e.preventDefault(); ultimo.focus(); }
+      else if (!e.shiftKey && document.activeElement === ultimo) { e.preventDefault(); primero.focus(); }
+    }
+  }
+  document.addEventListener('keydown', manejarTecla);
+
+  function cerrar() {
+    document.removeEventListener('keydown', manejarTecla);
+    document.body.removeChild(overlay);
+    if (elementoPrevio && typeof elementoPrevio.focus === 'function') elementoPrevio.focus();
+  }
+
+  return { box, cerrar };
+}
+
 function confirmarPedido() {
   if (cart.length === 0) { showToast("Tu mochilita está vacía 👜"); return; }
 
-  const box = document.createElement("div");
-  Object.assign(box.style, { position:'fixed', top:'50%', left:'50%', transform:'translate(-50%,-50%)',
-    background:'#fff', padding:'25px', borderRadius:'12px', boxShadow:'0 4px 20px rgba(0,0,0,0.3)', zIndex:'2000', textAlign:'center' });
-  box.innerHTML = `
+  const { box, cerrar } = crearDialogoFlotante('Confirmar pedido', `
     <h3 style="margin-bottom:10px;">¿Confirmar pedido? 🛍️</h3>
     <p>Total: <b>$${cart.reduce((t,p)=>t+p.precio*p.cantidad,0).toFixed(2)}</b></p>
     <div style="margin-top:15px;display:flex;justify-content:center;gap:10px;">
       <button id="confirmYes" style="background:#6a0dad;color:#fff;border:none;padding:8px 14px;border-radius:6px;cursor:pointer;">Sí, confirmar</button>
       <button id="confirmNo"  style="background:#ccc;border:none;padding:8px 14px;border-radius:6px;cursor:pointer;">Cancelar</button>
-    </div>`;
-  document.body.appendChild(box);
+    </div>`);
 
-  box.querySelector('#confirmYes').onclick = () => { document.body.removeChild(box); seleccionarMetodoPago(); };
-  box.querySelector('#confirmNo').onclick  = () => { document.body.removeChild(box); showToast("Pedido cancelado"); };
+  box.querySelector('#confirmYes').onclick = () => { cerrar(); seleccionarMetodoPago(); };
+  box.querySelector('#confirmNo').onclick  = () => { cerrar(); showToast("Pedido cancelado"); };
 }
 
 function seleccionarMetodoPago() {
-  const box = document.createElement("div");
-  Object.assign(box.style, { position:'fixed', top:'50%', left:'50%', transform:'translate(-50%,-50%)',
-    background:'#fff', padding:'25px', borderRadius:'12px', boxShadow:'0 4px 20px rgba(0,0,0,0.3)', zIndex:'2000', textAlign:'center' });
-  box.innerHTML = `
+  const { box, cerrar } = crearDialogoFlotante('Método de pago', `
     <h3 style="margin-bottom:15px;">Método de pago 💳</h3>
     <div style="display:flex;justify-content:center;gap:10px;flex-wrap:wrap;">
       <button class="btn" id="pagoEfectivo">Efectivo</button>
       <button class="btn" id="pagoTarjeta">Tarjeta</button>
       <button class="btn" id="pagoTransferencia">Transferencia</button>
     </div>
-    <button class="btn btn-cancel" id="pagoCancel" style="margin-top:14px;">Cancelar</button>`;
-  document.body.appendChild(box);
+    <button class="btn btn-cancel" id="pagoCancel" style="margin-top:14px;">Cancelar</button>`);
 
-  const close = () => document.body.removeChild(box);
-  box.querySelector('#pagoEfectivo').onclick      = () => { close(); openTicketModal("Efectivo"); };
-  box.querySelector('#pagoTarjeta').onclick       = () => { close(); openTicketModal("Tarjeta"); };
-  box.querySelector('#pagoTransferencia').onclick = () => { close(); openTicketModal("Transferencia"); };
-  box.querySelector('#pagoCancel').onclick        = () => { close(); showToast("Pago cancelado"); };
+  box.querySelector('#pagoEfectivo').onclick      = () => { cerrar(); openTicketModal("Efectivo"); };
+  box.querySelector('#pagoTarjeta').onclick       = () => { cerrar(); openTicketModal("Tarjeta"); };
+  box.querySelector('#pagoTransferencia').onclick = () => { cerrar(); openTicketModal("Transferencia"); };
+  box.querySelector('#pagoCancel').onclick        = () => { cerrar(); showToast("Pago cancelado"); };
 }
 
-/* ── MODAL HELPERS ───────────────────────────────────────── */
+/* ── MODAL HELPERS (accesibles) ──────────────────────────────
+ * Fase 6: antes solo alternaban 'display' y un aria-hidden estático.
+ * Un usuario de teclado o de lector de pantalla podía:
+ *   - quedar navegando "detrás" del modal (el foco nunca se movía
+ *     adentro al abrir),
+ *   - tabular fuera del modal hacia elementos ocultos detrás,
+ *   - no tener forma de cerrar con Escape,
+ *   - perder su posición original al cerrar (el foco no regresaba
+ *     al botón que abrió el modal).
+ * Ahora: al abrir, se guarda el elemento que tenía el foco, se marca
+ * el modal con role="dialog" + aria-modal="true", se mueve el foco
+ * al primer elemento enfocable de adentro, se atrapa Tab/Shift+Tab
+ * dentro del modal, y Escape cierra. Al cerrar, se libera todo eso y
+ * el foco regresa a quien abrió el modal.
+ */
+let elementoAntesDelModal = null;
+let modalActivoId = null;
+
+function getFocusablesEnModal(modalEl) {
+  return Array.from(modalEl.querySelectorAll(
+    'a[href], button:not([disabled]), textarea:not([disabled]), input:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])'
+  )).filter(el => el.offsetParent !== null);
+}
+
+function manejarTeclaModal(e) {
+  if (!modalActivoId) return;
+  const modal = document.getElementById(modalActivoId);
+  if (!modal) return;
+
+  if (e.key === 'Escape') {
+    e.preventDefault();
+    hideModal(modalActivoId);
+    return;
+  }
+
+  if (e.key === 'Tab') {
+    const focusables = getFocusablesEnModal(modal);
+    if (focusables.length === 0) return;
+    const primero = focusables[0];
+    const ultimo  = focusables[focusables.length - 1];
+
+    if (e.shiftKey && document.activeElement === primero) {
+      e.preventDefault();
+      ultimo.focus();
+    } else if (!e.shiftKey && document.activeElement === ultimo) {
+      e.preventDefault();
+      primero.focus();
+    }
+  }
+}
+
 function showModal(id) {
   const el = document.getElementById(id);
   if (!el) return;
+
+  elementoAntesDelModal = document.activeElement;
+  modalActivoId = id;
+
   el.style.display = 'block';
   el.setAttribute('aria-hidden', 'false');
+  el.setAttribute('role', 'dialog');
+  el.setAttribute('aria-modal', 'true');
+
+  const focusables = getFocusablesEnModal(el);
+  if (focusables.length > 0) focusables[0].focus();
+  else el.setAttribute('tabindex', '-1'), el.focus();
+
+  document.addEventListener('keydown', manejarTeclaModal);
 }
+
 function hideModal(id) {
   const el = document.getElementById(id);
   if (!el) return;
+
   el.style.display = 'none';
   el.setAttribute('aria-hidden', 'true');
+
+  if (modalActivoId === id) {
+    document.removeEventListener('keydown', manejarTeclaModal);
+    modalActivoId = null;
+    if (elementoAntesDelModal && typeof elementoAntesDelModal.focus === 'function') {
+      elementoAntesDelModal.focus();
+    }
+    elementoAntesDelModal = null;
+  }
 }
 
 /* ── VIEWER 360° ─────────────────────────────────────────── */
@@ -581,8 +697,16 @@ function openModal360(url, title) {
   showModal('modal360');
 }
 function closeModal360() { document.getElementById('viewer360').classList.remove('spin-anim'); hideModal('modal360'); }
-function startSpin()     { document.getElementById('viewer360').classList.add('spin-anim'); }
-function stopSpin()      { document.getElementById('viewer360').classList.remove('spin-anim'); }
+function startSpin()     {
+  document.getElementById('viewer360').classList.add('spin-anim');
+  document.getElementById('btnPlay360').setAttribute('aria-pressed', 'true');
+  document.getElementById('btnPause360').setAttribute('aria-pressed', 'false');
+}
+function stopSpin()      {
+  document.getElementById('viewer360').classList.remove('spin-anim');
+  document.getElementById('btnPlay360').setAttribute('aria-pressed', 'false');
+  document.getElementById('btnPause360').setAttribute('aria-pressed', 'true');
+}
 
 function close360View(e) {
   if (e.target.id === 'viewer360Modal')

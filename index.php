@@ -19,7 +19,7 @@
       <img src="papeleria.jpeg" alt="Logo Papelería El Profe" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
     </div>
       <div>
-        <div style="font-weight:800;color:#000">Papelería</div>
+        <div style="font-weight:800;color:var(--accent)">Papelería</div>
         <div style="font-size:12px;color:rgb(1, 1, 2)">Útiles escolares y Material de oficina</div>
       </div>
     </div>
@@ -27,11 +27,12 @@
       <a href="#inicio">Inicio</a>
       <a href="#catalogo">Catálogo</a>
       
-      <a href="#mochilita" title="Ver Mochilita" style="display:flex; align-items:center; position:relative; text-decoration:none;">
-        <img src="Mochila.png" alt="Mochila" id="nav-img-mochila" style="height: 28px; width: auto; transition: transform 0.3s ease;">
-        <span id="cart-badge" style="position:absolute; top:-6px; right:-10px; background:#d9534f; color:white; font-size:11px; font-weight:bold; padding:2px 6px; border-radius:10px; display:none; box-shadow:0 2px 4px rgba(0,0,0,0.2); z-index: 10;">0</span>
+      <a href="#mochilita" title="Ver Mochilita" aria-label="Ver mi mochilita, carrito de compras" style="display:flex; align-items:center; position:relative; text-decoration:none;">
+        <img src="Mochila.png" alt="" id="nav-img-mochila" style="height: 28px; width: auto; transition: transform 0.3s ease;">
+        <span id="cart-badge" aria-hidden="true" style="position:absolute; top:-6px; right:-10px; background:#d9534f; color:white; font-size:11px; font-weight:bold; padding:2px 6px; border-radius:10px; display:none; box-shadow:0 2px 4px rgba(0,0,0,0.2); z-index: 10;">0</span>
       </a>
       
+      <label for="searchBox" class="sr-only">Buscar producto</label>
       <input type="text" id="searchBox" placeholder="Buscar producto..." oninput="filterProducts(this.value)" />
       
       <div id="auth-nav-container">
@@ -40,7 +41,10 @@
     </nav>
   </header>
 
-  <div id="app-content" style="flex: 1; padding-bottom: 40px;"></div>
+  <a href="#app-content" class="skip-link">Saltar al contenido principal</a>
+
+  <div id="app-content" tabindex="-1" style="flex: 1; padding-bottom: 40px;"></div>
+
 
   <footer style="margin-top:auto; text-align:center; padding:10px 0; background:#f06a8a; color:white;">
     © <span id="year"></span> Papelería
@@ -49,9 +53,10 @@
 
 <!-- ==================== MODALES ==================== -->
 
-<div id="modalCantidad" class="modal" aria-hidden="true">
+<div id="modalCantidad" class="modal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="mc-title">
   <h3 id="mc-title">Cuantas unidades?</h3>
   <div style="text-align:center">
+    <label for="mc-cantidad" class="sr-only">Cantidad de unidades a agregar</label>
     <input id="mc-cantidad" type="number" min="1" max="999" value="1"
       oninput="this.value=this.value.replace(/[^0-9]/g,'');if(this.value<1)this.value=1;if(this.value.length>3)this.value=this.value.slice(0,3);" />
   </div>
@@ -63,8 +68,8 @@
 
 <div id="toast" class="toast">Agregado a tu mochilita</div>
 
-<div id="modalTicket" class="modal">
-  <h3>Ticket de compra</h3>
+<div id="modalTicket" class="modal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="ticket-title">
+  <h3 id="ticket-title">Ticket de compra</h3>
   <div id="ticketItems" style="text-align:left; max-height:260px; overflow:auto; margin-top:8px;"></div>
   <p style="font-weight:800; text-align:right; margin-top:8px;">Total: $<span id="ticketTotal">0</span></p>
   <div style="margin-top:8px; text-align:center">Deseas recibir el ticket por correo?</div>
@@ -73,6 +78,7 @@
     <button class="btn btn-cancel" onclick="finishTicketWithoutEmail()">No, gracias</button>
   </div>
   <div id="ticketEmailRow" style="display:none; margin-top:12px;">
+    <label for="ticketEmailInput" class="sr-only">Correo electrónico para enviar el ticket</label>
     <input id="ticketEmailInput" type="email" placeholder="correo@ejemplo.com" />
     <div class="actions" style="margin-top:8px;">
       <button class="btn" onclick="sendTicketByEmail()">Enviar</button>
@@ -83,7 +89,7 @@
 </div>
 
 <!-- Modal 360 con animacion de giro -->
-<div id="modal360" class="modal" aria-hidden="true" style="max-width:900px;">
+<div id="modal360" class="modal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="modal360Title" style="max-width:900px;">
   <h3 id="modal360Title">360 Viewer</h3>
   <div class="viewer360" id="viewer360">
     <div class="spin" id="viewerSpin">
@@ -91,8 +97,8 @@
     </div>
   </div>
   <div style="display:flex;gap:8px;justify-content:center;margin-top:12px;">
-    <button class="btn" id="btnPlay360"  onclick="startSpin()">Reproducir</button>
-    <button class="btn secondary" id="btnPause360" onclick="stopSpin()">Pausar</button>
+    <button class="btn" id="btnPlay360"  onclick="startSpin()" aria-pressed="true">Reproducir</button>
+    <button class="btn secondary" id="btnPause360" onclick="stopSpin()" aria-pressed="false">Pausar</button>
     <button class="btn btn-cancel" onclick="closeModal360()">Cerrar</button>
   </div>
   <p style="text-align:center;font-size:13px;color:#023;">(Vista 360 provisional)</p>
@@ -102,33 +108,38 @@
 <div id="viewer360Modal" onclick="close360View(event)">
   <img id="viewer360Img" src="" alt="Vista 360" />
 </div>
-<div id="modalAuth" class="modal" style="max-width: 420px; padding: 25px;">
+<div id="modalAuth" class="modal" aria-hidden="true" role="dialog" aria-modal="true" aria-label="Acceso a tu cuenta" style="max-width: 420px; padding: 25px;">
   
   <div id="auth-login-view">
     <h3>Ingresar a tu Cuenta</h3>
+    <label for="authLoginEmail" class="sr-only">Correo electrónico</label>
     <input id="authLoginEmail" type="email" placeholder="Correo electrónico" style="width:100%; padding:10px; margin-bottom:12px; border-radius:6px; border:1px solid #ccc;" />
+    <label for="authLoginPass" class="sr-only">Contraseña</label>
     <input id="authLoginPass" type="password" placeholder="Contraseña" style="width:100%; padding:10px; margin-bottom:15px; border-radius:6px; border:1px solid #ccc;" />
     <button class="btn" style="width:100%;" onclick="ejecutarLoginPublico()">Iniciar Sesión</button>
     <p style="text-align:center; margin-top:15px; font-size:14px;">
-      ¿No tienes cuenta? <a style="color:var(--accent); cursor:pointer; font-weight:700;" onclick="cambiarVistaAuth('registro')">Regístrate aquí</a>
+      ¿No tienes cuenta? <a href="#" style="color:var(--accent); cursor:pointer; font-weight:700;" onclick="event.preventDefault(); cambiarVistaAuth('registro')">Regístrate aquí</a>
     </p>
   </div>
 
   <div id="auth-register-view" style="display:none;">
     <h3>Crear una Cuenta</h3>
+    <label for="authRegNombre" class="sr-only">Nombre completo</label>
     <input id="authRegNombre" type="text" placeholder="Nombre completo" style="width:100%; padding:10px; margin-bottom:12px; border-radius:6px; border:1px solid #ccc;" />
+    <label for="authRegEmail" class="sr-only">Correo electrónico</label>
     <input id="authRegEmail" type="email" placeholder="Correo electrónico" style="width:100%; padding:10px; margin-bottom:12px; border-radius:6px; border:1px solid #ccc;" />
+    <label for="authRegPass" class="sr-only">Contraseña</label>
     <input id="authRegPass" type="password" placeholder="Contraseña" style="width:100%; padding:10px; margin-bottom:15px; border-radius:6px; border:1px solid #ccc;" />
     <button class="btn" style="width:100%;" onclick="ejecutarRegistroPublico()">Registrarse</button>
     <p style="text-align:center; margin-top:15px; font-size:14px;">
-      ¿Ya tienes cuenta? <a style="color:var(--accent); cursor:pointer; font-weight:700;" onclick="cambiarVistaAuth('login')">Inicia sesión</a>
+      ¿Ya tienes cuenta? <a href="#" style="color:var(--accent); cursor:pointer; font-weight:700;" onclick="event.preventDefault(); cambiarVistaAuth('login')">Inicia sesión</a>
     </p>
   </div>
 
   <div class="actions" style="margin-top:10px;">
     <button class="btn btn-cancel" onclick="cerrarModalAuth()">Cerrar</button>
   </div>
-  <p id="authModalMsg" style="text-align:center; margin-top:10px; font-weight:600; color:#d9534f; display:none;"></p>
+  <p id="authModalMsg" style="text-align:center; margin-top:10px; font-weight:600; color:#c9302c; display:none;"></p>
 </div>
 
 <!-- Panel flotante del asistente -->
