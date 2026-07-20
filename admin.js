@@ -284,14 +284,14 @@ function renderAdminProductsTable() {
   tbody.innerHTML = '';
   products.forEach((p, i) => {
     const tr = document.createElement('tr');
-    tr.style.borderBottom = '1px solid #eee';
+    tr.style.borderBottom = '1px solid var(--border)';
     tr.innerHTML = `
       <td style="padding:12px;">${escapeHtmlAdmin(p.nombre)}</td>
       <td style="padding:12px;">$${Number(p.precio).toFixed(2)}</td>
       <td style="padding:12px;">${p.stock}</td>
       <td style="padding:12px;">
         <button class="btn" style="padding:6px 10px; font-size:12px;" onclick="openEditProductModal(${i})" aria-label="Editar ${escapeHtmlAdmin(p.nombre)}">Editar</button>
-        <button class="btn btn-cancel" style="padding:6px 10px; font-size:12px; background:#c9302c; color:white;" onclick="deleteProduct(${i})" aria-label="Eliminar ${escapeHtmlAdmin(p.nombre)}">Eliminar</button>
+        <button class="btn btn-cancel" style="padding:6px 10px; font-size:12px; background:var(--danger); color:white;" onclick="deleteProduct(${i})" aria-label="Eliminar ${escapeHtmlAdmin(p.nombre)}">Eliminar</button>
       </td>`;
     tbody.appendChild(tr);
   });
@@ -300,16 +300,16 @@ function renderAdminProductsTable() {
 function renderOrdersList() {
   const div = document.getElementById('ordersList');
   if (orders.length === 0) {
-    div.innerHTML = '<div style="color:#888;">No hay pedidos registrados.</div>'; return;
+    div.innerHTML = '<div style="color:var(--text-muted);">No hay pedidos registrados.</div>'; return;
   }
   div.innerHTML = '';
   orders.forEach(o => {
     const el = document.createElement('div');
-    el.style.cssText = 'border-bottom:1px solid #f1f3f6; padding:12px 0;';
+    el.style.cssText = 'border-bottom:1px solid var(--border); padding:12px 0;';
     el.innerHTML = `
-      <div style="font-weight:700; color:var(--accent-dark);">${escapeHtmlAdmin(o.id)} <span style="font-weight:400; color:#666; font-size:13px;">(${escapeHtmlAdmin(o.fecha)})</span></div>
-      <div style="font-size:14px; margin-top:6px; color:#444;">${escapeHtmlAdmin(o.items)}</div>
-      <div style="margin-top:6px; font-weight:700; color:#222;">Total: $${Number(o.total).toFixed(2)} &bull; ${escapeHtmlAdmin(o.correo) || 'Venta en mostrador'}</div>`;
+      <div style="font-weight:700; color:var(--text);">${escapeHtmlAdmin(o.id)} <span style="font-weight:400; color:var(--text-muted); font-size:13px;">(${escapeHtmlAdmin(o.fecha)})</span></div>
+      <div style="font-size:14px; margin-top:6px; color:var(--text);">${escapeHtmlAdmin(o.items)}</div>
+      <div style="margin-top:6px; font-weight:700; color:var(--text);">Total: $${Number(o.total).toFixed(2)} &bull; ${escapeHtmlAdmin(o.correo) || 'Venta en mostrador'}</div>`;
     div.appendChild(el);
   });
 }

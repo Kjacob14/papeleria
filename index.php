@@ -28,7 +28,7 @@
       <img src="papeleria.jpeg" alt="Logo Papelería El Profe" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
     </div>
       <div>
-        <div style="font-weight:800;color:var(--accent)">Papelería</div>
+        <div style="font-weight:800;color:var(--text)">Papelería</div>
         <div style="font-size:12px;color:rgb(1, 1, 2)">Útiles escolares y Material de oficina</div>
       </div>
     </div>
@@ -62,7 +62,7 @@
   <div id="app-content" tabindex="-1" style="flex: 1; padding-bottom: 40px;"></div>
 
 
-  <footer style="margin-top:auto; text-align:center; padding:10px 0; background:#f06a8a; color:white;">
+  <footer style="margin-top:auto; text-align:center; padding:10px 0; background:var(--surface); color:var(--text-muted); border-top:1px solid var(--border);">
     © <span id="year"></span> Papelería
   </footer>
 </main>
@@ -117,7 +117,7 @@
     <button class="btn secondary" id="btnPause360" onclick="stopSpin()" aria-pressed="false">Pausar</button>
     <button class="btn btn-cancel" onclick="closeModal360()">Cerrar</button>
   </div>
-  <p style="text-align:center;font-size:13px;color:#023;">(Vista 360 provisional)</p>
+  <p style="text-align:center;font-size:13px;color:var(--text-muted);">(Vista 360 provisional)</p>
 </div>
 
 <!-- Modal 360 con drag -->
@@ -129,33 +129,33 @@
   <div id="auth-login-view">
     <h3>Ingresar a tu Cuenta</h3>
     <label for="authLoginEmail" class="sr-only">Correo electrónico</label>
-    <input id="authLoginEmail" type="email" placeholder="Correo electrónico" style="width:100%; padding:10px; margin-bottom:12px; border-radius:6px; border:1px solid #ccc;" />
+    <input id="authLoginEmail" type="email" placeholder="Correo electrónico" style="width:100%; padding:10px; margin-bottom:12px; border-radius:6px; border:1px solid var(--border); background:var(--surface); color:var(--text);" />
     <label for="authLoginPass" class="sr-only">Contraseña</label>
-    <input id="authLoginPass" type="password" placeholder="Contraseña" style="width:100%; padding:10px; margin-bottom:15px; border-radius:6px; border:1px solid #ccc;" />
+    <input id="authLoginPass" type="password" placeholder="Contraseña" style="width:100%; padding:10px; margin-bottom:15px; border-radius:6px; border:1px solid var(--border); background:var(--surface); color:var(--text);" />
     <button class="btn" style="width:100%;" onclick="ejecutarLoginPublico()">Iniciar Sesión</button>
     <p style="text-align:center; margin-top:15px; font-size:14px;">
-      ¿No tienes cuenta? <a href="#" style="color:var(--accent); cursor:pointer; font-weight:700;" onclick="event.preventDefault(); cambiarVistaAuth('registro')">Regístrate aquí</a>
+      ¿No tienes cuenta? <a href="#" style="color:var(--text); text-decoration:underline; cursor:pointer; font-weight:700;" onclick="event.preventDefault(); cambiarVistaAuth('registro')">Regístrate aquí</a>
     </p>
   </div>
 
   <div id="auth-register-view" style="display:none;">
     <h3>Crear una Cuenta</h3>
     <label for="authRegNombre" class="sr-only">Nombre completo</label>
-    <input id="authRegNombre" type="text" placeholder="Nombre completo" style="width:100%; padding:10px; margin-bottom:12px; border-radius:6px; border:1px solid #ccc;" />
+    <input id="authRegNombre" type="text" placeholder="Nombre completo" style="width:100%; padding:10px; margin-bottom:12px; border-radius:6px; border:1px solid var(--border); background:var(--surface); color:var(--text);" />
     <label for="authRegEmail" class="sr-only">Correo electrónico</label>
-    <input id="authRegEmail" type="email" placeholder="Correo electrónico" style="width:100%; padding:10px; margin-bottom:12px; border-radius:6px; border:1px solid #ccc;" />
+    <input id="authRegEmail" type="email" placeholder="Correo electrónico" style="width:100%; padding:10px; margin-bottom:12px; border-radius:6px; border:1px solid var(--border); background:var(--surface); color:var(--text);" />
     <label for="authRegPass" class="sr-only">Contraseña</label>
-    <input id="authRegPass" type="password" placeholder="Contraseña" style="width:100%; padding:10px; margin-bottom:15px; border-radius:6px; border:1px solid #ccc;" />
+    <input id="authRegPass" type="password" placeholder="Contraseña" style="width:100%; padding:10px; margin-bottom:15px; border-radius:6px; border:1px solid var(--border); background:var(--surface); color:var(--text);" />
     <button class="btn" style="width:100%;" onclick="ejecutarRegistroPublico()">Registrarse</button>
     <p style="text-align:center; margin-top:15px; font-size:14px;">
-      ¿Ya tienes cuenta? <a href="#" style="color:var(--accent); cursor:pointer; font-weight:700;" onclick="event.preventDefault(); cambiarVistaAuth('login')">Inicia sesión</a>
+      ¿Ya tienes cuenta? <a href="#" style="color:var(--text); text-decoration:underline; cursor:pointer; font-weight:700;" onclick="event.preventDefault(); cambiarVistaAuth('login')">Inicia sesión</a>
     </p>
   </div>
 
   <div class="actions" style="margin-top:10px;">
     <button class="btn btn-cancel" onclick="cerrarModalAuth()">Cerrar</button>
   </div>
-  <p id="authModalMsg" style="text-align:center; margin-top:10px; font-weight:600; color:#c9302c; display:none;"></p>
+  <p id="authModalMsg" style="text-align:center; margin-top:10px; font-weight:600; color:var(--danger); display:none;"></p>
 </div>
 
 <!-- Panel flotante del asistente -->

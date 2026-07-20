@@ -136,7 +136,7 @@ async function ejecutarRegistroPublico() {
   try {
     const data = await apiPost('crear_cuenta', { nombre, correo, contrasena: pass });
     if (data.ok) {
-      msg.style.color = '#5cb85c';
+      msg.style.color = 'var(--success)';
       msg.textContent = '¡Cuenta creada! Iniciando sesión...';
       msg.style.display = 'block';
       setTimeout(async () => {
@@ -149,12 +149,12 @@ async function ejecutarRegistroPublico() {
         }
       }, 1200);
     } else {
-      msg.style.color = '#c9302c';
+      msg.style.color = 'var(--danger)';
       msg.textContent = data.error || 'Error al crear la cuenta.';
       msg.style.display = 'block';
     }
   } catch (e) {
-    msg.style.color = '#c9302c';
+    msg.style.color = 'var(--danger)';
     msg.textContent = 'Error de conexión.';
     msg.style.display = 'block';
   }
@@ -165,7 +165,7 @@ function actualizarNavbarUsuario() {
   if (!container) return;
   if (usuarioActivo) {
     container.innerHTML = `
-      <span style="font-weight:700; margin-right:10px; color:#333;">Hola, ${escapeHtml(usuarioActivo.nombre.split(' ')[0])}</span>
+      <span style="font-weight:700; margin-right:10px; color:var(--text);">Hola, ${escapeHtml(usuarioActivo.nombre.split(' ')[0])}</span>
       <button class="btn danger" style="padding:4px 10px; font-size:13px;" onclick="cerrarSesionPublica()">Salir</button>`;
   } else {
     container.innerHTML = `<button class="btn secondary" onclick="abrirModalAuth('login')">Iniciar Sesión</button>`;
@@ -221,14 +221,14 @@ function renderCatalog(customList = null) {
       <div class="item-info">
         <h3 style="margin-top:10px;font-size:15px;">${escapeHtml(p.nombre)}</h3>
         <div class="price" style="font-size:18px;margin:8px 0;">$${Number(p.precio).toFixed(2)}</div>
-        <div style="font-size:12px;color:#666;">Stock: ${p.stock ?? 0}</div>
+        <div style="font-size:12px;color:var(--text-muted);">Stock: ${p.stock ?? 0}</div>
         ${variantesHTML}
       </div>
       <div style="display:flex;gap:6px;justify-content:center;margin-top:8px;">
         <button class="btn" onclick="openModalCantidad(${i})" ${p.stock <= 0 ? 'disabled' : ''}>
           ${p.stock <= 0 ? 'Sin stock' : 'Agregar'}
         </button>
-        <button class="btn secondary" onclick="openModal360('${escapeHtml(p.imagen)}','${escapeHtml(p.nombre)}')">Ver 360°</button>
+        <button class="btn secondary" style="padding:8px 10px;font-size:13px;" onclick="openModal360('${escapeHtml(p.imagen)}','${escapeHtml(p.nombre)}')">Ver 360°</button>
       </div>`;
     container.appendChild(div);
   });
@@ -256,7 +256,7 @@ function renderCart() {
   cart.forEach((item, i) => {
     sum += item.precio * item.cantidad;
     const li = document.createElement('li');
-    li.style.cssText = 'display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid #eee;';
+    li.style.cssText = 'display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--border);';
     li.innerHTML = `
       <span>${escapeHtml(item.nombre)} x${item.cantidad} — $${(item.precio * item.cantidad).toFixed(2)}</span>
       <span style="display:flex;gap:4px;">
@@ -281,14 +281,14 @@ function agregarCombo(id, nombre, precio) {
 
 function buildComboCard(c) {
   const etiquetaHTML = c.etiqueta
-    ? `<div style="position:absolute;top:-10px;right:-10px;background:#c9302c;color:#fff;padding:4px 10px;border-radius:12px;font-weight:bold;font-size:12px;box-shadow:0 2px 5px rgba(0,0,0,0.2);z-index:2;">${escapeHtml(c.etiqueta)}</div>`
+    ? `<div style="position:absolute;top:-10px;right:-10px;background:var(--accent);color:var(--on-accent);padding:4px 10px;border-radius:12px;font-weight:bold;font-size:12px;box-shadow:0 2px 5px rgba(0,0,0,0.2);z-index:2;">${escapeHtml(c.etiqueta)}</div>`
     : '';
   return `
-    <div class="item" style="border:2px solid var(--accent);position:relative;background:#fff;flex:0 0 auto;width:280px;scroll-snap-align:center;">
+    <div class="item" style="border:2px solid var(--accent);position:relative;background:var(--surface);flex:0 0 auto;width:280px;scroll-snap-align:center;">
       ${etiquetaHTML}
       <img class="thumb" src="${escapeHtml(c.imagen)}" alt="${escapeHtml(c.nombre)}" style="height:150px;object-fit:contain;" loading="lazy" />
       <h3 style="margin-top:10px;">${escapeHtml(c.nombre)}</h3>
-      <p style="font-size:13px;color:#555;padding:0 10px;">${escapeHtml(c.descripcion)}</p>
+      <p style="font-size:13px;color:var(--text-muted);padding:0 10px;">${escapeHtml(c.descripcion)}</p>
       <div class="price" style="font-size:18px;margin:8px 0;">$${Number(c.precio).toFixed(2)}</div>
       <div class="actions">
         <button class="btn" onclick="agregarCombo(${c.id},'${escapeHtml(c.nombre)}',${c.precio})">Agregar a Mochilita</button>
@@ -539,7 +539,7 @@ function crearDialogoFlotante(etiqueta, innerHTML) {
   box.setAttribute('aria-modal', 'true');
   box.setAttribute('aria-label', etiqueta);
   Object.assign(box.style, {
-    background: '#fff', padding: '25px', borderRadius: '12px',
+    background: 'var(--surface)', padding: '25px', borderRadius: '12px',
     boxShadow: '0 4px 20px rgba(0,0,0,0.3)', textAlign: 'center', maxWidth: '90%',
   });
   box.innerHTML = innerHTML;
@@ -578,8 +578,8 @@ function confirmarPedido() {
     <h3 style="margin-bottom:10px;">¿Confirmar pedido? 🛍️</h3>
     <p>Total: <b>$${cart.reduce((t,p)=>t+p.precio*p.cantidad,0).toFixed(2)}</b></p>
     <div style="margin-top:15px;display:flex;justify-content:center;gap:10px;">
-      <button id="confirmYes" style="background:#6a0dad;color:#fff;border:none;padding:8px 14px;border-radius:6px;cursor:pointer;">Sí, confirmar</button>
-      <button id="confirmNo"  style="background:#ccc;border:none;padding:8px 14px;border-radius:6px;cursor:pointer;">Cancelar</button>
+      <button id="confirmYes" class="btn">Sí, confirmar</button>
+      <button id="confirmNo"  class="btn secondary">Cancelar</button>
     </div>`);
 
   box.querySelector('#confirmYes').onclick = () => { cerrar(); seleccionarMetodoPago(); };
@@ -897,7 +897,7 @@ function updateNavActive(hash) {
   });
   const mochilaLink = document.querySelector('a[href="#mochilita"]');
   if (mochilaLink) {
-    mochilaLink.style.filter = hash === '#mochilita' ? 'drop-shadow(0 0 5px #a020f0)' : '';
+    mochilaLink.style.filter = hash === '#mochilita' ? 'drop-shadow(0 0 5px #F1A0B6)' : '';
   }
 }
 
@@ -921,17 +921,17 @@ function router() {
 
     const combosHTML = combos.length
       ? combos.map(buildComboCard).join('')
-      : '<div style="color:#666;padding:20px;">No hay paquetes disponibles en este momento.</div>';
+      : '<div style="color:var(--text-muted);padding:20px;">No hay paquetes disponibles en este momento.</div>';
 
     const popularesHTML = populares.map((p, i) => {
       const idx = products.indexOf(p);
       return `
         <div class="item" style="position:relative;">
-          <div style="position:absolute;top:8px;left:8px;background:#f4a300;color:#fff;font-size:11px;font-weight:800;padding:3px 8px;border-radius:10px;">⭐ Popular</div>
+          <div style="position:absolute;top:8px;left:8px;background:var(--accent-secondary);color:var(--on-accent);font-size:11px;font-weight:800;padding:3px 8px;border-radius:10px;">⭐ Popular</div>
           <img class="thumb" src="${escapeHtml(p.imagen)}" alt="${escapeHtml(p.nombre)}" loading="lazy" />
           <h3 style="margin-top:10px;font-size:14px;">${escapeHtml(p.nombre)}</h3>
           <div class="price">$${Number(p.precio).toFixed(2)}</div>
-          <div style="font-size:12px;color:#666;margin-bottom:6px;">Stock: ${p.stock ?? 0}</div>
+          <div style="font-size:12px;color:var(--text-muted);margin-bottom:6px;">Stock: ${p.stock ?? 0}</div>
           <button class="btn" onclick="openModalCantidad(${idx})" ${p.stock <= 0 ? 'disabled' : ''}>
             ${p.stock <= 0 ? 'Sin stock' : 'Agregar'}
           </button>
@@ -939,24 +939,24 @@ function router() {
     }).join('');
 
     appContent.innerHTML = `
-      <section class="hero" style="background:linear-gradient(135deg,#fccdf7 0%,#f38ce4 100%);padding:50px 20px;border-bottom:4px solid var(--accent);box-shadow:0 4px 15px rgba(0,0,0,0.1);">
+      <section class="hero" style="background:linear-gradient(135deg, var(--accent-secondary) 0%, var(--accent) 100%);padding:50px 20px;box-shadow:0 4px 15px rgba(41,59,93,0.1);">
         <div class="container-full">
-          <h1 style="font-size:42px;color:var(--accent-dark);text-shadow:1px 1px 2px rgba(255,255,255,0.5);">¡Bienvenido a Papelería El Profe!</h1>
-          <p style="font-size:18px;color:#111;font-weight:600;margin-top:10px;">Útiles escolares y material de oficina al mejor precio.</p>
-          <a href="#catalogo" class="btn" style="margin-top:18px;display:inline-block;padding:12px 28px;font-size:16px;text-decoration:none;">Ver Catálogo Completo</a>
+          <h1 style="font-size:42px;color:var(--on-accent);">¡Bienvenido a Papelería El Profe!</h1>
+          <p style="font-size:18px;color:var(--on-accent);font-weight:600;margin-top:10px;opacity:0.85;">Útiles escolares y material de oficina al mejor precio.</p>
+          <a href="#catalogo" class="btn secondary" style="margin-top:18px;display:inline-block;padding:12px 28px;font-size:16px;text-decoration:none;">Ver Catálogo Completo</a>
         </div>
       </section>
 
       <section style="padding:30px 20px 10px;">
         <div class="container-full">
-          <h2 style="margin-bottom:18px;color:#000;">🎒 Paquetes Especiales</h2>
+          <h2 style="margin-bottom:18px;color:var(--text);">🎒 Paquetes Especiales</h2>
           <div class="carousel-container" id="combosCarouselInicio">${combosHTML}</div>
         </div>
       </section>
 
       <section style="padding:30px 20px 50px;">
         <div class="container-full">
-          <h2 style="margin-bottom:18px;color:#000;">⭐ Lo Más Pedido en la Escuela</h2>
+          <h2 style="margin-bottom:18px;color:var(--text);">⭐ Lo Más Pedido en la Escuela</h2>
           <div class="grid">${popularesHTML}</div>
         </div>
       </section>
@@ -970,7 +970,7 @@ function router() {
     appContent.innerHTML = `
       <section id="productos">
         <div class="container-full">
-          <h2 style="margin-bottom:20px;color:#000;">Catálogo Completo</h2>
+          <h2 style="margin-bottom:20px;color:var(--text);">Catálogo Completo</h2>
           <div class="grid" id="catalogo"></div>
         </div>
       </section>

@@ -1,27 +1,47 @@
 /* ============================================================
    Papelería El Profe — Archivo Completo Consolidado
-   Rediseño de paleta: minimalista (lila + gris claro) + modo oscuro
-   (azul pizarra). Los productos son el protagonista: la UI se
-   mantiene neutra, el lila se reserva para acentos puntuales.
+   Fase 7: paleta minimalista de 5 colores.
+     color1 #FDFDFD  → fondo / superficie clara
+     color2 #EBF0F4  → fondo alterno / superficie secundaria
+     color3 #BBA4CB  → acento secundario (lila)
+     color4 #F1A0B6  → acento primario / CTA (rosa)
+     color5 #293B5D  → texto principal / fondo oscuro (azul marino)
+   Regla de accesibilidad verificada (WCAG AA, ratios ≥4.5:1):
+   los acentos (color3/color4) son demasiado claros para llevar texto
+   blanco encima o funcionar como color de texto sobre fondo claro.
+   Por eso: los botones de acento siempre usan color5 como texto, y
+   color3/color4 solo se usan como texto sobre fondos oscuros
+   (--surface-inverse), nunca sobre fondos claros.
 ============================================================ */
 
 :root {
-    /* ── Acento (lila) — igual en ambos modos, es la identidad de marca ── */
-    --accent: #7b4fc4;         /* lila principal: botones, enlaces activos, foco */
-    --accent-dark: #5b2fa8;    /* lila oscuro: hover, títulos con jerarquía */
-    --accent-soft: #efe9fb;    /* lila muy tenue: fondos de hover, badges suaves */
+    /* ── Paleta base (referencia directa a los 5 colores) ── */
+    --color1: #FDFDFD;
+    --color2: #EBF0F4;
+    --color3: #BBA4CB;
+    --color4: #F1A0B6;
+    --color5: #293B5D;
 
-    /* ── Superficies y texto — modo claro: gris muy claro, no blanco puro ── */
-    --bg: #f4f3f6;             /* fondo general de la página */
-    --bg-alt: #ffffff;         /* secciones alternas / tarjetas */
-    --surface: #ffffff;        /* tarjetas, modales */
-    --surface-2: #f8f7fa;      /* superficies secundarias (hover de filas, etc.) */
-    --border: #e4e1ea;         /* bordes sutiles */
-    --text: #201d29;           /* texto principal */
-    --text-muted: #6b6775;     /* texto secundario */
-    --shadow: 0 8px 20px rgba(30, 20, 50, 0.06);
+    /* ── Acento — el rosa es el CTA principal, el lila el secundario ── */
+    --accent: var(--color4);        /* rosa: botones de acción, enlaces activos */
+    --accent-dark: #e07a95;         /* rosa oscurecido: hover del CTA */
+    --accent-secondary: var(--color3); /* lila: acentos secundarios, badges */
+    --accent-soft: #faeaee;         /* rosa muy tenue: fondos de hover suaves */
+    --on-accent: var(--color5);     /* texto SOBRE botones de acento (nunca blanco: falla contraste) */
 
-    /* ── Semántico (igual en ambos modos, con leve ajuste de saturación) ── */
+    /* ── Superficies y texto — modo claro ── */
+    --bg: var(--color2);            /* fondo general de la página */
+    --bg-alt: var(--color1);        /* secciones alternas */
+    --surface: var(--color1);       /* tarjetas, modales */
+    --surface-2: var(--color2);     /* superficies secundarias (hover de filas, etc.) */
+    --surface-inverse: var(--color5); /* superficies oscuras puntuales (footer, badges oscuros) */
+    --border: #d8dee6;              /* bordes sutiles, derivado de color2 */
+    --text: var(--color5);          /* texto principal */
+    --text-muted: #5c6a86;          /* texto secundario, derivado de color5 */
+    --text-on-inverse: var(--color1); /* texto sobre --surface-inverse */
+    --shadow: 0 8px 20px rgba(41, 59, 93, 0.08);
+
+    /* ── Semántico (independiente de la paleta de marca) ── */
     --success: #3f9142;
     --danger: #c9463c;
     --danger-dark: #a83a31;
@@ -30,24 +50,30 @@
     /* ── Compat: nombres antiguos usados en el HTML existente ── */
     --muted: var(--text-muted);
     --card: var(--surface);
-    --toast-bg: rgba(32, 29, 41, 0.92);
-    --bg-pink: var(--bg); /* se conserva el nombre por compatibilidad, ya no es rosa */
-    --card-glass: rgba(255, 255, 255, 0.7);
+    --toast-bg: rgba(41, 59, 93, 0.94);
+    --bg-pink: var(--bg);
+    --card-glass: rgba(253, 253, 253, 0.7);
 }
 
-/* ── Modo oscuro: azul pizarra, no negro puro ── */
+/* ── Modo oscuro: se invierte el eje claro/oscuro de la misma paleta,
+   los acentos se mantienen (ya verificados con buen contraste sobre
+   fondo color5) ── */
 [data-theme="dark"] {
-    --accent: #a58af0;          /* lila más claro/saturado para contraste en fondo oscuro */
-    --accent-dark: #c3b0f7;
-    --accent-soft: #2c2748;
+    --accent: var(--color4);
+    --accent-dark: #f5b6c6;
+    --accent-secondary: var(--color3);
+    --accent-soft: #3a2f42;
+    --on-accent: var(--color5);
 
-    --bg: #171b26;              /* slate oscuro base */
-    --bg-alt: #1c2130;
-    --surface: #1e2333;
-    --surface-2: #232941;
-    --border: #303752;
-    --text: #e7e6ec;
-    --text-muted: #9a9cb0;
+    --bg: var(--color5);
+    --bg-alt: #223052;
+    --surface: #26375a;
+    --surface-2: #2e4066;
+    --surface-inverse: var(--color2);
+    --border: #3c4d72;
+    --text: var(--color1);
+    --text-muted: #aab4cc;
+    --text-on-inverse: var(--color5);
     --shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
 
     --success: #5cb85f;
@@ -57,25 +83,29 @@
 
     --muted: var(--text-muted);
     --card: var(--surface);
-    --toast-bg: rgba(230, 230, 236, 0.92);
+    --toast-bg: rgba(235, 240, 244, 0.94);
     --bg-pink: var(--bg);
-    --card-glass: rgba(30, 35, 51, 0.7);
+    --card-glass: rgba(38, 55, 90, 0.7);
 }
 
 /* Respeta el sistema si el usuario no ha elegido manualmente */
 @media (prefers-color-scheme: dark) {
     :root:not([data-theme="light"]) {
-        --accent: #a58af0;
-        --accent-dark: #c3b0f7;
-        --accent-soft: #2c2748;
+        --accent: var(--color4);
+        --accent-dark: #f5b6c6;
+        --accent-secondary: var(--color3);
+        --accent-soft: #3a2f42;
+        --on-accent: var(--color5);
 
-        --bg: #171b26;
-        --bg-alt: #1c2130;
-        --surface: #1e2333;
-        --surface-2: #232941;
-        --border: #303752;
-        --text: #e7e6ec;
-        --text-muted: #9a9cb0;
+        --bg: var(--color5);
+        --bg-alt: #223052;
+        --surface: #26375a;
+        --surface-2: #2e4066;
+        --surface-inverse: var(--color2);
+        --border: #3c4d72;
+        --text: var(--color1);
+        --text-muted: #aab4cc;
+        --text-on-inverse: var(--color5);
         --shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
 
         --success: #5cb85f;
@@ -85,9 +115,9 @@
 
         --muted: var(--text-muted);
         --card: var(--surface);
-        --toast-bg: rgba(230, 230, 236, 0.92);
+        --toast-bg: rgba(235, 240, 244, 0.94);
         --bg-pink: var(--bg);
-        --card-glass: rgba(30, 35, 51, 0.7);
+        --card-glass: rgba(38, 55, 90, 0.7);
     }
 }
 
@@ -111,8 +141,8 @@
     position: absolute;
     top: -60px;
     left: 10px;
-    background: var(--accent-dark);
-    color: #fff;
+    background: var(--accent);
+    color: var(--on-accent);
     padding: 10px 18px;
     border-radius: 8px;
     font-weight: 700;
@@ -164,14 +194,14 @@ header.navbar {
     align-items: center;
     justify-content: center;
     font-weight: 700;
-    color: var(--accent);
+    color: var(--text);
     box-shadow: var(--shadow);
     overflow: hidden;
 }
 
 .nav-right { display: flex; align-items: center; gap: 16px; }
 .nav-right a { text-decoration: none; font-weight: 700; color: var(--text); cursor: pointer; transition: color 0.2s; }
-.nav-right a:hover { color: var(--accent); }
+.nav-right a:hover { color: var(--text-muted); }
 .nav-right input {
     padding: 6px 10px;
     border-radius: 8px;
@@ -200,20 +230,28 @@ header.navbar {
 }
 .theme-toggle:hover { background: var(--surface-2); transform: translateY(-1px); }
 
-/* --- Botones --- */
+/* --- Botones ---
+ * Fase 7: --accent (rosa) y --accent-secondary (lila) son demasiado
+ * claros para llevar texto blanco (contraste ~2:1, muy por debajo
+ * del mínimo AA 4.5:1). Por eso el botón primario usa --on-accent
+ * (azul oscuro de la misma paleta) como color de texto — verificado
+ * en ~5.5:1, cómodamente por encima del mínimo, en modo claro y
+ * oscuro por igual.
+ */
 .btn {
     padding: 8px 12px;
     border-radius: 10px;
     border: none;
     background: var(--accent);
-    color: #ffffff;
+    color: var(--on-accent);
     cursor: pointer;
     font-weight: 700;
     transition: all 0.2s ease;
 }
-.btn:hover { opacity: 0.9; transform: translateY(-2px); }
+.btn:hover { opacity: 0.88; transform: translateY(-2px); }
 .btn:active { transform: scale(0.95); }
-.btn.secondary { background: var(--surface); color: var(--accent); border: 1px solid var(--border); }
+.btn.secondary { background: var(--surface); color: var(--text); border: 1.5px solid var(--border); }
+.btn.secondary:hover { border-color: var(--accent); }
 .btn.danger { background: var(--danger); color: #fff; }
 .btn:disabled { background: var(--border) !important; color: var(--text-muted) !important; cursor: not-allowed; opacity: 0.7; }
 
@@ -249,7 +287,7 @@ header.navbar {
 .item:hover { transform: translateY(-4px); box-shadow: 0 14px 28px rgba(30, 20, 50, 0.1); }
 .thumb { width: 100%; height: 180px; object-fit: cover; border-radius: 12px; background: var(--surface-2); cursor: pointer; }
 .item h3 { margin: 10px 0; font-size: 15px; color: var(--text); }
-.price { font-weight: 800; color: var(--accent-dark); font-size: 18px; }
+.price { font-weight: 800; color: var(--text); font-size: 18px; }
 .item .actions { display: flex; gap: 8px; margin-top: auto; width: 100%; justify-content: center; }
 
 /* --- Mochilita --- */
@@ -277,7 +315,7 @@ header.navbar {
     background: var(--toast-bg); box-shadow: 0 10px 30px rgba(0,0,0,0.2);
     opacity: 0; transition: all 0.3s ease;
 }
-[data-theme="dark"] .toast { color: #171b26; }
+[data-theme="dark"] .toast { color: var(--color5); }
 .toast.show { display: block; opacity: 1; }
 
 /* --- Chat Assistant --- */
@@ -298,10 +336,10 @@ header.navbar {
     position: fixed; right: 30px; width: 60px; height: 60px;
     border-radius: 50%; border: none; box-shadow: var(--shadow);
     cursor: pointer; transition: transform 0.2s; z-index: 1000;
-    color: #fff;
+    color: var(--on-accent);
 }
 .chatbot-btn { bottom: 120px; background: var(--accent); }
-.voice-btn { bottom: 40px; background: var(--accent-dark); }
+.voice-btn { bottom: 40px; background: var(--accent-secondary); }
 .chatbot-btn:hover, .voice-btn:hover { transform: scale(1.08); }
 
 /* --- Carrusel --- */
