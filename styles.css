@@ -1,129 +1,148 @@
 /* ============================================================
-   Papelería El Profe — Archivo Completo Consolidado
-   Fase 7: paleta minimalista de 5 colores.
-     color1 #FDFDFD  → fondo / superficie clara
-     color2 #EBF0F4  → fondo alterno / superficie secundaria
-     color3 #BBA4CB  → acento secundario (lila)
-     color4 #F1A0B6  → acento primario / CTA (rosa)
-     color5 #293B5D  → texto principal / fondo oscuro (azul marino)
-   Regla de accesibilidad verificada (WCAG AA, ratios ≥4.5:1):
-   los acentos (color3/color4) son demasiado claros para llevar texto
-   blanco encima o funcionar como color de texto sobre fondo claro.
-   Por eso: los botones de acento siempre usan color5 como texto, y
-   color3/color4 solo se usan como texto sobre fondos oscuros
-   (--surface-inverse), nunca sobre fondos claros.
+   Papelería El Profe — Sistema de diseño Fase 8
+   Rediseño completo: pizarrón profundo + ivory cálido + mauve,
+   pensado para no cansar la vista en ninguno de los dos temas.
+
+   Paleta base (verificada WCAG AA, ver notas de contraste):
+     --ink       #0C2332  → pizarrón oscuro (texto en claro / fondo en oscuro)
+     --paper     #FAF8EF  → ivory cálido (fondo en claro, nunca blanco puro)
+     --cloud     #F5F1E6  → blanco roto (texto en oscuro, nunca #fff puro)
+     --mauve     #7C7287  → acento secundario (badges, bordes, nunca CTA)
+     --mauve-deep#5B4E68  → CTA en modo claro (texto blanco, 7.68:1)
+     --sand      #D9C9A8  → CTA en modo oscuro (texto pizarrón, 9.88:1)
+
+   Regla dura de contraste, no negociable:
+     --sand SIEMPRE lleva texto --ink encima (con blanco cae a 1.6:1).
+     --mauve-deep SIEMPRE lleva texto blanco/--cloud encima.
+     --mauve (el tono medio) nunca es fondo de botón: se queda en
+     bordes, texto muted-de-acento y detalles pequeños.
 ============================================================ */
 
 :root {
-    /* ── Paleta base (referencia directa a los 5 colores) ── */
-    --color1: #FDFDFD;
-    --color2: #EBF0F4;
-    --color3: #BBA4CB;
-    --color4: #F1A0B6;
-    --color5: #293B5D;
+    /* ── Paleta base ── */
+    --ink: #0C2332;
+    --ink-soft: #16324A;
+    --paper: #FAF8EF;
+    --cloud: #F5F1E6;
+    --mauve: #7C7287;
+    --mauve-deep: #5B4E68;
+    --sand: #D9C9A8;
+    --sand-soft: #EDE4D0;
 
-    /* ── Acento — el rosa es el CTA principal, el lila el secundario ── */
-    --accent: var(--color4);        /* rosa: botones de acción, enlaces activos */
-    --accent-dark: #e07a95;         /* rosa oscurecido: hover del CTA */
-    --accent-secondary: var(--color3); /* lila: acentos secundarios, badges */
-    --accent-soft: #faeaee;         /* rosa muy tenue: fondos de hover suaves */
-    --on-accent: var(--color5);     /* texto SOBRE botones de acento (nunca blanco: falla contraste) */
+    /* ── Acento / CTA — modo claro: mauve oscurecido, texto blanco ── */
+    --accent: var(--mauve-deep);
+    --accent-hover: #4A3F55;
+    --accent-secondary: var(--mauve);
+    --accent-soft: #EFEAF0;          /* fondo tenue para hovers/chips */
+    --on-accent: #FFFFFF;
 
     /* ── Superficies y texto — modo claro ── */
-    --bg: var(--color2);            /* fondo general de la página */
-    --bg-alt: var(--color1);        /* secciones alternas */
-    --surface: var(--color1);       /* tarjetas, modales */
-    --surface-2: var(--color2);     /* superficies secundarias (hover de filas, etc.) */
-    --surface-inverse: var(--color5); /* superficies oscuras puntuales (footer, badges oscuros) */
-    --border: #d8dee6;              /* bordes sutiles, derivado de color2 */
-    --text: var(--color5);          /* texto principal */
-    --text-muted: #5c6a86;          /* texto secundario, derivado de color5 */
-    --text-on-inverse: var(--color1); /* texto sobre --surface-inverse */
-    --shadow: 0 8px 20px rgba(41, 59, 93, 0.08);
+    --bg: var(--paper);
+    --bg-alt: #F1EDDE;               /* un paso más cálido que --bg, para secciones alternas */
+    --surface: #FFFFFF;
+    --surface-2: #F4F1E4;
+    --surface-inverse: var(--ink);
+    --border: #E3DDC9;
+    --text: var(--ink);
+    --text-muted: #5B6B78;
+    --text-on-inverse: var(--cloud);
+    --shadow: 0 8px 24px rgba(12, 35, 50, 0.08);
 
-    /* ── Semántico (independiente de la paleta de marca) ── */
-    --success: #3f9142;
-    --danger: #c9463c;
-    --danger-dark: #a83a31;
-    --warning: #b8862e;
+    /* ── Semántico ── */
+    --success: #3F8F5F;
+    --danger: #B23A2E;
+    --danger-dark: #8F2E24;
+    --warning: #A66A1E;
+
+    /* ── Tipografía ── */
+    --font-display: 'Fraunces', 'Georgia', serif;
+    --font-body: 'Work Sans', 'Quicksand', sans-serif;
 
     /* ── Compat: nombres antiguos usados en el HTML existente ── */
     --muted: var(--text-muted);
     --card: var(--surface);
-    --toast-bg: rgba(41, 59, 93, 0.94);
+    --toast-bg: rgba(12, 35, 50, 0.94);
     --bg-pink: var(--bg);
-    --card-glass: rgba(253, 253, 253, 0.7);
+    --card-glass: rgba(255, 255, 255, 0.75);
 }
 
-/* ── Modo oscuro: se invierte el eje claro/oscuro de la misma paleta,
-   los acentos se mantienen (ya verificados con buen contraste sobre
-   fondo color5) ── */
+/* ── Modo oscuro: pizarrón real, no un simple "invertir claro".
+   Beige cálido como acento, blanco roto como texto. ── */
 [data-theme="dark"] {
-    --accent: var(--color4);
-    --accent-dark: #f5b6c6;
-    --accent-secondary: var(--color3);
-    --accent-soft: #3a2f42;
-    --on-accent: var(--color5);
+    --accent: var(--sand);
+    --accent-hover: #E8DCC0;
+    --accent-secondary: var(--mauve);
+    --accent-soft: #2A3F4E;
+    --on-accent: var(--ink);
 
-    --bg: var(--color5);
-    --bg-alt: #223052;
-    --surface: #26375a;
-    --surface-2: #2e4066;
-    --surface-inverse: var(--color2);
-    --border: #3c4d72;
-    --text: var(--color1);
-    --text-muted: #aab4cc;
-    --text-on-inverse: var(--color5);
-    --shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+    --bg: var(--ink);
+    --bg-alt: #0F2A3D;
+    --surface: #152B3D;
+    --surface-2: #1C3448;
+    --surface-inverse: var(--sand-soft);
+    --border: #2A4258;
+    --text: var(--cloud);
+    --text-muted: #A9B8C4;
+    --text-on-inverse: var(--ink);
+    --shadow: 0 10px 28px rgba(0, 0, 0, 0.45);
 
-    --success: #5cb85f;
-    --danger: #e0685d;
-    --danger-dark: #c94f44;
-    --warning: #d9a94e;
+    --success: #6FBF8B;
+    --danger: #E08277;
+    --danger-dark: #C96B60;
+    --warning: #E0AE64;
 
     --muted: var(--text-muted);
     --card: var(--surface);
-    --toast-bg: rgba(235, 240, 244, 0.94);
+    --toast-bg: rgba(245, 241, 230, 0.95);
     --bg-pink: var(--bg);
-    --card-glass: rgba(38, 55, 90, 0.7);
+    --card-glass: rgba(21, 43, 61, 0.75);
 }
 
 /* Respeta el sistema si el usuario no ha elegido manualmente */
 @media (prefers-color-scheme: dark) {
     :root:not([data-theme="light"]) {
-        --accent: var(--color4);
-        --accent-dark: #f5b6c6;
-        --accent-secondary: var(--color3);
-        --accent-soft: #3a2f42;
-        --on-accent: var(--color5);
+        --accent: var(--sand);
+        --accent-hover: #E8DCC0;
+        --accent-secondary: var(--mauve);
+        --accent-soft: #2A3F4E;
+        --on-accent: var(--ink);
 
-        --bg: var(--color5);
-        --bg-alt: #223052;
-        --surface: #26375a;
-        --surface-2: #2e4066;
-        --surface-inverse: var(--color2);
-        --border: #3c4d72;
-        --text: var(--color1);
-        --text-muted: #aab4cc;
-        --text-on-inverse: var(--color5);
-        --shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+        --bg: var(--ink);
+        --bg-alt: #0F2A3D;
+        --surface: #152B3D;
+        --surface-2: #1C3448;
+        --surface-inverse: var(--sand-soft);
+        --border: #2A4258;
+        --text: var(--cloud);
+        --text-muted: #A9B8C4;
+        --text-on-inverse: var(--ink);
+        --shadow: 0 10px 28px rgba(0, 0, 0, 0.45);
 
-        --success: #5cb85f;
-        --danger: #e0685d;
-        --danger-dark: #c94f44;
-        --warning: #d9a94e;
+        --success: #6FBF8B;
+        --danger: #E08277;
+        --danger-dark: #C96B60;
+        --warning: #E0AE64;
 
         --muted: var(--text-muted);
         --card: var(--surface);
-        --toast-bg: rgba(235, 240, 244, 0.94);
+        --toast-bg: rgba(245, 241, 230, 0.95);
         --bg-pink: var(--bg);
-        --card-glass: rgba(38, 55, 90, 0.7);
+        --card-glass: rgba(21, 43, 61, 0.75);
     }
 }
 
 * { box-sizing: border-box; }
 
-/* Oculta visualmente pero mantiene accesible para lectores de pantalla */
+/* Respeta preferencia de movimiento reducido */
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+}
+
 .sr-only {
     position: absolute;
     width: 1px;
@@ -136,13 +155,12 @@
     border: 0;
 }
 
-/* Skip link: oculto hasta que recibe foco por teclado (Tab) */
 .skip-link {
     position: absolute;
     top: -60px;
     left: 10px;
-    background: var(--accent);
-    color: var(--on-accent);
+    background: var(--ink);
+    color: var(--cloud);
     padding: 10px 18px;
     border-radius: 8px;
     font-weight: 700;
@@ -150,17 +168,38 @@
     z-index: 5000;
     transition: top 0.2s ease;
 }
-.skip-link:focus {
-    top: 10px;
+.skip-link:focus { top: 10px; }
+
+/* Foco visible consistente en toda la app (clave de accesibilidad) */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+[tabindex]:focus-visible {
+    outline: 2.5px solid var(--mauve-deep);
+    outline-offset: 2px;
+}
+[data-theme="dark"] a:focus-visible,
+[data-theme="dark"] button:focus-visible,
+[data-theme="dark"] input:focus-visible,
+[data-theme="dark"] [tabindex]:focus-visible {
+    outline-color: var(--sand);
 }
 
 html, body {
     height: 100%;
     margin: 0;
-    font-family: 'Quicksand', sans-serif;
+    font-family: var(--font-body);
+    font-size: 16px;
+    line-height: 1.5;
     color: var(--text);
     background: var(--bg);
-    transition: background-color 0.2s ease, color 0.2s ease;
+    transition: background-color 0.25s ease, color 0.25s ease;
+}
+
+h1, h2, h3, h4 {
+    font-family: var(--font-display);
+    font-weight: 600;
+    letter-spacing: -0.01em;
 }
 
 main {
@@ -176,7 +215,7 @@ header.navbar {
     justify-content: space-between;
     align-items: center;
     background: var(--surface);
-    padding: 14px 30px;
+    padding: 16px 30px;
     position: sticky;
     top: 0;
     width: 100%;
@@ -184,11 +223,24 @@ header.navbar {
     border-bottom: 1px solid var(--border);
 }
 
+/* Variante de marca: usada donde antes iba un gradiente inline
+   (navbar del panel admin). Sustituye style="background: linear-
+   gradient(...)" — ver Fase B, limpieza de estilos en línea. */
+header.navbar.navbar-brand {
+    background: var(--ink);
+    border-bottom: 1px solid var(--ink);
+}
+header.navbar.navbar-brand .brand-title,
+header.navbar.navbar-brand .brand-subtitle {
+    color: var(--cloud);
+}
+header.navbar.navbar-brand .brand-subtitle { opacity: 0.72; }
+
 .brand { display: flex; align-items: center; gap: 15px; }
 .logo {
-    width: 72px;
-    height: 72px;
-    border-radius: 12px;
+    width: 68px;
+    height: 68px;
+    border-radius: 14px;
     background: var(--surface-2);
     display: flex;
     align-items: center;
@@ -197,21 +249,25 @@ header.navbar {
     color: var(--text);
     box-shadow: var(--shadow);
     overflow: hidden;
+    border: 1px solid var(--border);
 }
 
 .nav-right { display: flex; align-items: center; gap: 16px; }
-.nav-right a { text-decoration: none; font-weight: 700; color: var(--text); cursor: pointer; transition: color 0.2s; }
-.nav-right a:hover { color: var(--text-muted); }
+.nav-right a { text-decoration: none; font-weight: 600; color: var(--text); cursor: pointer; transition: color 0.2s; }
+.nav-right a:hover { color: var(--mauve-deep); }
+[data-theme="dark"] .nav-right a:hover { color: var(--sand); }
 .nav-right input {
-    padding: 6px 10px;
+    padding: 8px 12px;
     border-radius: 8px;
     border: 1.5px solid var(--border);
     outline: none;
     font-size: 14px;
-    background: var(--surface);
+    font-family: var(--font-body);
+    background: var(--bg-alt);
     color: var(--text);
 }
-.nav-right button { border: none; padding: 6px 14px; border-radius: 8px; cursor: pointer; }
+.nav-right input::placeholder { color: var(--text-muted); }
+.nav-right button { border: none; padding: 8px 14px; border-radius: 8px; cursor: pointer; font-family: var(--font-body); }
 
 /* --- Toggle de modo oscuro --- */
 .theme-toggle {
@@ -222,7 +278,7 @@ header.navbar {
     height: 38px;
     border-radius: 50%;
     border: 1.5px solid var(--border);
-    background: var(--surface);
+    background: var(--bg-alt);
     color: var(--text);
     cursor: pointer;
     font-size: 16px;
@@ -231,39 +287,51 @@ header.navbar {
 .theme-toggle:hover { background: var(--surface-2); transform: translateY(-1px); }
 
 /* --- Botones ---
- * Fase 7: --accent (rosa) y --accent-secondary (lila) son demasiado
- * claros para llevar texto blanco (contraste ~2:1, muy por debajo
- * del mínimo AA 4.5:1). Por eso el botón primario usa --on-accent
- * (azul oscuro de la misma paleta) como color de texto — verificado
- * en ~5.5:1, cómodamente por encima del mínimo, en modo claro y
- * oscuro por igual.
+ * Fase 8: --accent ya viene resuelto por tema (mauve oscuro en claro,
+ * beige cálido en oscuro), ambos verificados ≥7:1 contra su --on-accent.
+ * Nunca se usa --accent-secondary (mauve medio) como fondo de botón:
+ * su contraste es demasiado ajustado para ser el default del sistema.
  */
 .btn {
-    padding: 8px 12px;
+    padding: 10px 16px;
     border-radius: 10px;
     border: none;
     background: var(--accent);
     color: var(--on-accent);
     cursor: pointer;
+    font-family: var(--font-body);
     font-weight: 700;
+    font-size: 14px;
     transition: all 0.2s ease;
 }
-.btn:hover { opacity: 0.88; transform: translateY(-2px); }
-.btn:active { transform: scale(0.95); }
-.btn.secondary { background: var(--surface); color: var(--text); border: 1.5px solid var(--border); }
-.btn.secondary:hover { border-color: var(--accent); }
+.btn:hover { background: var(--accent-hover); transform: translateY(-2px); }
+.btn:active { transform: scale(0.96); }
+.btn.secondary { background: transparent; color: var(--text); border: 1.5px solid var(--border); }
+.btn.secondary:hover { border-color: var(--accent); background: var(--accent-soft); }
 .btn.danger { background: var(--danger); color: #fff; }
-.btn:disabled { background: var(--border) !important; color: var(--text-muted) !important; cursor: not-allowed; opacity: 0.7; }
+.btn.danger:hover { background: var(--danger-dark); }
+.btn:disabled { background: var(--border) !important; color: var(--text-muted) !important; cursor: not-allowed; opacity: 0.7; transform: none !important; }
+
+/* Uso reservado para llamados a compra reales (checkout, confirmar
+   pedido). Mismo color que .btn por ahora — clase presente para que
+   futuras variaciones de énfasis no dependan de --accent global. */
+.btn-cta { background: var(--accent); color: var(--on-accent); }
+.btn-cta:hover { background: var(--accent-hover); }
 
 /* --- Hero --- */
-.hero { padding: 50px 20px; text-align: center; background: var(--bg-alt); border-bottom: 1px solid var(--border); }
-.hero h1 { margin: 6px 0; font-size: 42px; color: var(--text); }
-.hero p { margin: 10px 0; font-weight: 600; color: var(--text-muted); }
+.hero {
+    padding: 64px 20px;
+    text-align: center;
+    background: var(--bg-alt);
+    border-bottom: 1px solid var(--border);
+}
+.hero h1 { margin: 8px 0; font-size: 44px; color: var(--text); }
+.hero p { margin: 10px 0; font-weight: 500; color: var(--text-muted); font-size: 16px; }
 
 /* --- Grid de Productos --- */
 #productos {
     width: 100%;
-    padding: 30px 20px;
+    padding: 36px 20px;
     background: var(--bg);
 }
 
@@ -273,8 +341,8 @@ header.navbar {
 .item {
     background: var(--surface);
     border: 1px solid var(--border);
-    border-radius: 20px;
-    padding: 15px;
+    border-radius: 16px;
+    padding: 16px;
     text-align: center;
     box-shadow: var(--shadow);
     display: flex;
@@ -282,20 +350,34 @@ header.navbar {
     gap: 8px;
     align-items: center;
     justify-content: flex-start;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
 }
-.item:hover { transform: translateY(-4px); box-shadow: 0 14px 28px rgba(30, 20, 50, 0.1); }
-.thumb { width: 100%; height: 180px; object-fit: cover; border-radius: 12px; background: var(--surface-2); cursor: pointer; }
-.item h3 { margin: 10px 0; font-size: 15px; color: var(--text); }
-.price { font-weight: 800; color: var(--text); font-size: 18px; }
+.item:hover { transform: translateY(-4px); box-shadow: 0 16px 32px rgba(12, 35, 50, 0.12); border-color: var(--accent); }
+.thumb { width: 100%; height: 180px; object-fit: cover; border-radius: 10px; background: var(--surface-2); cursor: pointer; }
+.item h3 { margin: 8px 0; font-size: 15px; font-weight: 600; font-family: var(--font-body); color: var(--text); }
+.price { font-weight: 700; color: var(--text); font-size: 19px; font-family: var(--font-display); }
 .item .actions { display: flex; gap: 8px; margin-top: auto; width: 100%; justify-content: center; }
 
+/* Etiqueta puntual (ej. "Combo", "Oferta") — único uso admitido de
+   --mauve como fondo sólido, en texto muy pequeño donde el contraste
+   4.55:1 medido es aceptable para AA-large / uso decorativo. */
+.tag {
+    display: inline-block;
+    background: var(--accent-secondary);
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 3px 9px;
+    border-radius: 999px;
+    letter-spacing: 0.02em;
+}
+
 /* --- Mochilita --- */
-#mochilita { margin-top: 20px; padding: 25px; background: var(--surface); border-radius: 20px; border: 1px solid var(--border); }
+#mochilita { margin-top: 20px; padding: 25px; background: var(--surface); border-radius: 16px; border: 1px solid var(--border); }
 #listaMochilita { list-style: none; padding: 0; margin: 8px 0; }
 .cart-item {
     display: flex; justify-content: space-between; align-items: center;
-    background: var(--surface); padding: 12px 15px; border-radius: 12px; margin-bottom: 10px;
+    background: var(--bg-alt); padding: 12px 15px; border-radius: 12px; margin-bottom: 10px;
     border: 1px solid var(--border);
 }
 .cart-controls { display: flex; align-items: center; gap: 8px; }
@@ -304,42 +386,44 @@ header.navbar {
 .modal {
     display: none; position: fixed; z-index: 4000;
     left: 50%; top: 50%; transform: translate(-50%,-50%);
-    width: 92%; max-width: 500px; background: var(--surface); border-radius: 20px; padding: 25px;
-    box-shadow: 0 20px 50px rgba(0,0,0,0.2);
+    width: 92%; max-width: 500px; background: var(--surface); border-radius: 18px; padding: 26px;
+    box-shadow: 0 24px 56px rgba(0,0,0,0.25);
     color: var(--text);
     border: 1px solid var(--border);
 }
 .toast {
     display: none; position: fixed; left: 50%; top: 50%; transform: translate(-50%,-50%);
-    z-index: 4500; padding: 15px 25px; border-radius: 15px; color: #fff; font-weight: 700;
-    background: var(--toast-bg); box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    z-index: 4500; padding: 15px 25px; border-radius: 14px; color: var(--cloud); font-weight: 700;
+    background: var(--toast-bg); box-shadow: 0 12px 32px rgba(0,0,0,0.25);
     opacity: 0; transition: all 0.3s ease;
 }
-[data-theme="dark"] .toast { color: var(--color5); }
+[data-theme="dark"] .toast { color: var(--ink); }
 .toast.show { display: block; opacity: 1; }
 
 /* --- Chat Assistant --- */
 #assistantBox {
     display: none; position: fixed; bottom: 120px; right: 20px; width: 300px; z-index: 3000;
-    flex-direction: column; gap: 8px; border-radius: 14px;
+    flex-direction: column; gap: 8px; border-radius: 16px;
     background: var(--surface); color: var(--text); padding: 15px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+    box-shadow: 0 12px 32px rgba(0,0,0,0.18);
     border: 1px solid var(--border);
 }
-#assistantMessages { background: var(--surface-2); color: var(--text); border-radius: 8px; padding: 10px; height: 200px; overflow-y: auto; }
+#assistantMessages { background: var(--bg-alt); color: var(--text); border-radius: 10px; padding: 10px; height: 200px; overflow-y: auto; }
 .assistant-msg { font-size: 13px; margin: 6px 0; padding: 8px; border-radius: 8px; }
 .assistant-user { align-self: flex-end; background: var(--accent-soft); }
 .assistant-bot { align-self: flex-start; background: var(--surface); border: 1px solid var(--border); }
 
 /* --- Floating Buttons --- */
 .chatbot-btn, .voice-btn {
-    position: fixed; right: 30px; width: 60px; height: 60px;
+    position: fixed; right: 30px; width: 58px; height: 58px;
     border-radius: 50%; border: none; box-shadow: var(--shadow);
     cursor: pointer; transition: transform 0.2s; z-index: 1000;
     color: var(--on-accent);
+    font-size: 22px;
 }
 .chatbot-btn { bottom: 120px; background: var(--accent); }
-.voice-btn { bottom: 40px; background: var(--accent-secondary); }
+.voice-btn { bottom: 40px; background: var(--ink); color: var(--cloud); }
+[data-theme="dark"] .voice-btn { background: var(--surface-2); color: var(--cloud); border: 1px solid var(--border); }
 .chatbot-btn:hover, .voice-btn:hover { transform: scale(1.08); }
 
 /* --- Carrusel --- */
@@ -356,4 +440,5 @@ footer { text-align: center; padding: 20px; background: var(--surface); color: v
 @media (max-width: 900px) {
     #assistantBox { width: 90%; right: 5%; }
     .grid { grid-template-columns: 1fr; }
+    .hero h1 { font-size: 34px; }
 }

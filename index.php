@@ -25,7 +25,7 @@
   <header class="navbar">
     <div class="brand">
      <div class="logo">
-      <img src="papeleria.jpeg" alt="Logo Papelería El Profe" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+      <img src="papeleria.png" alt="Logo Papelería El Profe" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
     </div>
       <div>
         <div style="font-weight:800;color:var(--text)">Papelería</div>
