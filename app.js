@@ -242,8 +242,6 @@ function renderCatalog(customList = null) {
       <div class="u-flex-center u-gap-sm u-mt-sm">
         <button class="btn" onclick="openModalCantidad(${i})" ${p.stock <= 0 ? 'disabled' : ''}>
           ${p.stock <= 0 ? 'Sin stock' : 'Agregar'}
-        </button>
-        <button class="btn secondary btn-compact" onclick="openModal360('${escapeHtml(p.imagen)}','${escapeHtml(p.nombre)}')">Ver 360°</button>
       </div>`;
     container.appendChild(div);
   });

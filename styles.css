@@ -827,7 +827,7 @@ footer.footer-brand {
     font-weight: 700;
     font-size: 16px;
     padding: 0;
-    -moz-appearance: textfield;
+    appearance: textfield;
 }
 .qty-input::-webkit-outer-spin-button,
 .qty-input::-webkit-inner-spin-button {
