@@ -54,7 +54,7 @@ async function doAdminLogin() {
 
   if (!correo || !p) {
     msg.textContent = 'Completa todos los campos';
-    msg.style.display = 'block';
+    msg.classList.add('is-visible');
     return;
   }
 
@@ -62,20 +62,20 @@ async function doAdminLogin() {
     const data = await apiPost('login', { correo, contrasena: p });
 
     if (data.ok && data.rol === 'admin') {
-      document.getElementById('loginSection').style.display    = 'none';
-      document.getElementById('dashboardSection').style.display = 'block';
-      document.getElementById('btnLogout').style.display        = 'inline-block';
+      document.getElementById('loginSection').classList.add('u-hidden');
+      document.getElementById('dashboardSection').classList.remove('u-hidden');
+      document.getElementById('btnLogout').classList.remove('u-hidden');
       loadDashboardData();
     } else if (data.ok && data.rol !== 'admin') {
       msg.textContent   = 'Esta cuenta no tiene permisos de administrador';
-      msg.style.display = 'block';
+      msg.classList.add('is-visible');
     } else {
       msg.textContent   = data.error || 'Correo o contraseña incorrectos';
-      msg.style.display = 'block';
+      msg.classList.add('is-visible');
     }
   } catch (e) {
     msg.textContent   = 'Error de conexión con el servidor';
-    msg.style.display = 'block';
+    msg.classList.add('is-visible');
   }
 }
 
@@ -104,23 +104,23 @@ async function verificarSesionActiva() {
   try {
     const data = await apiGet('verificar_sesion');
     if (data.ok && data.sesionActiva) {
-      login.style.display     = 'none';
-      dashboard.style.display = 'block';
-      btnLogout.style.display = 'inline-block';
+      login.classList.add('u-hidden');
+      dashboard.classList.remove('u-hidden');
+      btnLogout.classList.remove('u-hidden');
       loadDashboardData();
     } else {
-      dashboard.style.display = 'none';
-      btnLogout.style.display = 'none';
-      login.style.display     = 'block';
+      dashboard.classList.add('u-hidden');
+      btnLogout.classList.add('u-hidden');
+      login.classList.remove('u-hidden');
     }
   } catch (e) {
     // Fallo de conexión genuino: se cae al login normal, sin bloquear
     // el acceso a la página.
-    dashboard.style.display = 'none';
-    btnLogout.style.display = 'none';
-    login.style.display     = 'block';
+    dashboard.classList.add('u-hidden');
+    btnLogout.classList.add('u-hidden');
+    login.classList.remove('u-hidden');
   } finally {
-    checking.style.display = 'none';
+    checking.classList.add('u-hidden');
   }
 }
 
@@ -284,14 +284,13 @@ function renderAdminProductsTable() {
   tbody.innerHTML = '';
   products.forEach((p, i) => {
     const tr = document.createElement('tr');
-    tr.style.borderBottom = '1px solid var(--border)';
     tr.innerHTML = `
-      <td style="padding:12px;">${escapeHtmlAdmin(p.nombre)}</td>
-      <td style="padding:12px;">$${Number(p.precio).toFixed(2)}</td>
-      <td style="padding:12px;">${p.stock}</td>
-      <td style="padding:12px;">
-        <button class="btn" style="padding:6px 10px; font-size:12px;" onclick="openEditProductModal(${i})" aria-label="Editar ${escapeHtmlAdmin(p.nombre)}">Editar</button>
-        <button class="btn btn-cancel" style="padding:6px 10px; font-size:12px; background:var(--danger); color:white;" onclick="deleteProduct(${i})" aria-label="Eliminar ${escapeHtmlAdmin(p.nombre)}">Eliminar</button>
+      <td>${escapeHtmlAdmin(p.nombre)}</td>
+      <td>$${Number(p.precio).toFixed(2)}</td>
+      <td>${p.stock}</td>
+      <td>
+        <button class="btn btn-compact" onclick="openEditProductModal(${i})" aria-label="Editar ${escapeHtmlAdmin(p.nombre)}">Editar</button>
+        <button class="btn btn-cancel btn-compact danger" onclick="deleteProduct(${i})" aria-label="Eliminar ${escapeHtmlAdmin(p.nombre)}">Eliminar</button>
       </td>`;
     tbody.appendChild(tr);
   });
@@ -300,16 +299,16 @@ function renderAdminProductsTable() {
 function renderOrdersList() {
   const div = document.getElementById('ordersList');
   if (orders.length === 0) {
-    div.innerHTML = '<div style="color:var(--text-muted);">No hay pedidos registrados.</div>'; return;
+    div.innerHTML = '<div class="u-text-muted">No hay pedidos registrados.</div>'; return;
   }
   div.innerHTML = '';
   orders.forEach(o => {
     const el = document.createElement('div');
-    el.style.cssText = 'border-bottom:1px solid var(--border); padding:12px 0;';
+    el.className = 'order-entry';
     el.innerHTML = `
-      <div style="font-weight:700; color:var(--text);">${escapeHtmlAdmin(o.id)} <span style="font-weight:400; color:var(--text-muted); font-size:13px;">(${escapeHtmlAdmin(o.fecha)})</span></div>
-      <div style="font-size:14px; margin-top:6px; color:var(--text);">${escapeHtmlAdmin(o.items)}</div>
-      <div style="margin-top:6px; font-weight:700; color:var(--text);">Total: $${Number(o.total).toFixed(2)} &bull; ${escapeHtmlAdmin(o.correo) || 'Venta en mostrador'}</div>`;
+      <div class="order-id">${escapeHtmlAdmin(o.id)} <span class="order-date">(${escapeHtmlAdmin(o.fecha)})</span></div>
+      <div class="order-items">${escapeHtmlAdmin(o.items)}</div>
+      <div class="order-total">Total: $${Number(o.total).toFixed(2)} &bull; ${escapeHtmlAdmin(o.correo) || 'Venta en mostrador'}</div>`;
     div.appendChild(el);
   });
 }

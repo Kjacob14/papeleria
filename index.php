@@ -5,7 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Papelería</title>
 
-<link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@500;600;700&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
 <script>
@@ -18,18 +20,18 @@
     // @media (prefers-color-scheme) definido en styles.css.
   })();
 </script>
-<link rel="stylesheet" href="styles.css?v=2">
+<link rel="stylesheet" href="styles.css?v=8">
 </head>
 <body>
 <main>
   <header class="navbar">
     <div class="brand">
      <div class="logo">
-      <img src="papeleria.png" alt="Logo Papelería El Profe" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+      <img src="papeleria.png" alt="Logo Papelería El Profe">
     </div>
       <div>
-        <div style="font-weight:800;color:var(--text)">Papelería</div>
-        <div style="font-size:12px;color:rgb(1, 1, 2)">Útiles escolares y Material de oficina</div>
+        <div class="brand-title u-text-bold">Papelería</div>
+        <div class="brand-subtitle u-text-sm u-text-muted">Útiles escolares y Material de oficina</div>
       </div>
     </div>
     <nav class="nav-right" id="adminPanelToggleContainer">
@@ -43,9 +45,9 @@
          title="Cambiar tema"
           onclick="toggleTema()"
         >🌙</button>
-      <a href="#mochilita" title="Ver Mochilita" aria-label="Ver mi mochilita, carrito de compras" style="display:flex; align-items:center; position:relative; text-decoration:none;">
-        <img src="Mochila.png" alt="" id="nav-img-mochila" style="height: 28px; width: auto; transition: transform 0.3s ease;">
-        <span id="cart-badge" aria-hidden="true" style="position:absolute; top:-6px; right:-10px; background:#d9534f; color:white; font-size:11px; font-weight:bold; padding:2px 6px; border-radius:10px; display:none; box-shadow:0 2px 4px rgba(0,0,0,0.2); z-index: 10;">0</span>
+      <a href="#mochilita" title="Ver Mochilita" aria-label="Ver mi mochilita, carrito de compras" class="cart-link">
+        <img src="Mochila.png" alt="" id="nav-img-mochila" class="cart-icon">
+        <span id="cart-badge" aria-hidden="true" class="cart-badge u-hidden">0</span>
       </a>
       
       <label for="searchBox" class="sr-only">Buscar producto</label>
@@ -59,10 +61,10 @@
 
   <a href="#app-content" class="skip-link">Saltar al contenido principal</a>
 
-  <div id="app-content" tabindex="-1" style="flex: 1; padding-bottom: 40px;"></div>
+  <div id="app-content" tabindex="-1" class="app-content"></div>
 
 
-  <footer style="margin-top:auto; text-align:center; padding:10px 0; background:var(--surface); color:var(--text-muted); border-top:1px solid var(--border);">
+  <footer class="footer-main">
     © <span id="year"></span> Papelería
   </footer>
 </main>
@@ -71,10 +73,12 @@
 
 <div id="modalCantidad" class="modal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="mc-title">
   <h3 id="mc-title">Cuantas unidades?</h3>
-  <div style="text-align:center">
+  <div class="qty-stepper">
+    <button type="button" class="qty-btn" onclick="stepCantidad(-1)" aria-label="Disminuir cantidad">−</button>
     <label for="mc-cantidad" class="sr-only">Cantidad de unidades a agregar</label>
-    <input id="mc-cantidad" type="number" min="1" max="999" value="1"
+    <input id="mc-cantidad" class="qty-input" type="number" min="1" max="999" value="1" inputmode="numeric"
       oninput="this.value=this.value.replace(/[^0-9]/g,'');if(this.value<1)this.value=1;if(this.value.length>3)this.value=this.value.slice(0,3);" />
+    <button type="button" class="qty-btn" onclick="stepCantidad(1)" aria-label="Aumentar cantidad">+</button>
   </div>
   <div class="actions">
     <button class="btn" onclick="confirmAddQuantity()">Agregar</button>
@@ -86,17 +90,17 @@
 
 <div id="modalTicket" class="modal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="ticket-title">
   <h3 id="ticket-title">Ticket de compra</h3>
-  <div id="ticketItems" style="text-align:left; max-height:260px; overflow:auto; margin-top:8px;"></div>
-  <p style="font-weight:800; text-align:right; margin-top:8px;">Total: $<span id="ticketTotal">0</span></p>
-  <div style="margin-top:8px; text-align:center">Deseas recibir el ticket por correo?</div>
-  <div style="display:flex; gap:8px; justify-content:center; margin-top:10px;">
+  <div id="ticketItems" class="ticket-items"></div>
+  <p class="ticket-total">Total: $<span id="ticketTotal">0</span></p>
+  <div class="u-text-center u-mt-md">Deseas recibir el ticket por correo?</div>
+  <div class="u-flex-center u-gap-md u-mt-md">
     <button class="btn" onclick="showTicketEmailInput()">Si, enviarlo</button>
     <button class="btn btn-cancel" onclick="finishTicketWithoutEmail()">No, gracias</button>
   </div>
-  <div id="ticketEmailRow" style="display:none; margin-top:12px;">
+  <div id="ticketEmailRow" class="u-hidden u-mt-md">
     <label for="ticketEmailInput" class="sr-only">Correo electrónico para enviar el ticket</label>
-    <input id="ticketEmailInput" type="email" placeholder="correo@ejemplo.com" />
-    <div class="actions" style="margin-top:8px;">
+    <input id="ticketEmailInput" type="email" placeholder="correo@ejemplo.com" class="form-input" />
+    <div class="actions u-mt-md">
       <button class="btn" onclick="sendTicketByEmail()">Enviar</button>
       <button class="btn btn-cancel" onclick="closeModalTicket()">Cancelar</button>
     </div>
@@ -105,64 +109,64 @@
 </div>
 
 <!-- Modal 360 con animacion de giro -->
-<div id="modal360" class="modal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="modal360Title" style="max-width:900px;">
+<div id="modal360" class="modal modal-wide" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="modal360Title">
   <h3 id="modal360Title">360 Viewer</h3>
   <div class="viewer360" id="viewer360">
     <div class="spin" id="viewerSpin">
       <img id="modal360Img" src="" alt="360 producto" draggable="false" />
     </div>
   </div>
-  <div style="display:flex;gap:8px;justify-content:center;margin-top:12px;">
+  <div class="u-flex-center u-gap-md u-mt-md">
     <button class="btn" id="btnPlay360"  onclick="startSpin()" aria-pressed="true">Reproducir</button>
     <button class="btn secondary" id="btnPause360" onclick="stopSpin()" aria-pressed="false">Pausar</button>
     <button class="btn btn-cancel" onclick="closeModal360()">Cerrar</button>
   </div>
-  <p style="text-align:center;font-size:13px;color:var(--text-muted);">(Vista 360 provisional)</p>
+  <p class="u-text-center u-text-sm u-text-muted">(Vista 360 provisional)</p>
 </div>
 
 <!-- Modal 360 con drag -->
 <div id="viewer360Modal" onclick="close360View(event)">
-  <img id="viewer360Img" src="" alt="Vista 360" />
+  <img id="viewer360Img" src="" alt="Vista 360" class="viewer-grab">
 </div>
-<div id="modalAuth" class="modal" aria-hidden="true" role="dialog" aria-modal="true" aria-label="Acceso a tu cuenta" style="max-width: 420px; padding: 25px;">
+<div id="modalAuth" class="modal modal-narrow" aria-hidden="true" role="dialog" aria-modal="true" aria-label="Acceso a tu cuenta">
   
   <div id="auth-login-view">
     <h3>Ingresar a tu Cuenta</h3>
     <label for="authLoginEmail" class="sr-only">Correo electrónico</label>
-    <input id="authLoginEmail" type="email" placeholder="Correo electrónico" style="width:100%; padding:10px; margin-bottom:12px; border-radius:6px; border:1px solid var(--border); background:var(--surface); color:var(--text);" />
+    <input id="authLoginEmail" type="email" placeholder="Correo electrónico" class="form-input" />
     <label for="authLoginPass" class="sr-only">Contraseña</label>
-    <input id="authLoginPass" type="password" placeholder="Contraseña" style="width:100%; padding:10px; margin-bottom:15px; border-radius:6px; border:1px solid var(--border); background:var(--surface); color:var(--text);" />
-    <button class="btn" style="width:100%;" onclick="ejecutarLoginPublico()">Iniciar Sesión</button>
-    <p style="text-align:center; margin-top:15px; font-size:14px;">
-      ¿No tienes cuenta? <a href="#" style="color:var(--text); text-decoration:underline; cursor:pointer; font-weight:700;" onclick="event.preventDefault(); cambiarVistaAuth('registro')">Regístrate aquí</a>
+    <input id="authLoginPass" type="password" placeholder="Contraseña" class="form-input" />
+    <button class="btn btn-block" onclick="ejecutarLoginPublico()">Iniciar Sesión</button>
+    <p class="auth-switch">
+      ¿No tienes cuenta? <a href="#" class="auth-switch-link" onclick="event.preventDefault(); cambiarVistaAuth('registro')">Regístrate aquí</a>
     </p>
   </div>
 
-  <div id="auth-register-view" style="display:none;">
+  <div id="auth-register-view" class="u-hidden">
     <h3>Crear una Cuenta</h3>
     <label for="authRegNombre" class="sr-only">Nombre completo</label>
-    <input id="authRegNombre" type="text" placeholder="Nombre completo" style="width:100%; padding:10px; margin-bottom:12px; border-radius:6px; border:1px solid var(--border); background:var(--surface); color:var(--text);" />
+    <input id="authRegNombre" type="text" placeholder="Nombre completo" class="form-input" />
     <label for="authRegEmail" class="sr-only">Correo electrónico</label>
-    <input id="authRegEmail" type="email" placeholder="Correo electrónico" style="width:100%; padding:10px; margin-bottom:12px; border-radius:6px; border:1px solid var(--border); background:var(--surface); color:var(--text);" />
+    <input id="authRegEmail" type="email" placeholder="Correo electrónico" class="form-input" />
     <label for="authRegPass" class="sr-only">Contraseña</label>
-    <input id="authRegPass" type="password" placeholder="Contraseña" style="width:100%; padding:10px; margin-bottom:15px; border-radius:6px; border:1px solid var(--border); background:var(--surface); color:var(--text);" />
-    <button class="btn" style="width:100%;" onclick="ejecutarRegistroPublico()">Registrarse</button>
-    <p style="text-align:center; margin-top:15px; font-size:14px;">
-      ¿Ya tienes cuenta? <a href="#" style="color:var(--text); text-decoration:underline; cursor:pointer; font-weight:700;" onclick="event.preventDefault(); cambiarVistaAuth('login')">Inicia sesión</a>
+    <input id="authRegPass" type="password" placeholder="Contraseña" class="form-input" />
+    <button class="btn btn-block" onclick="ejecutarRegistroPublico()">Registrarse</button>
+    <p class="auth-switch">
+      ¿Ya tienes cuenta? <a href="#" class="auth-switch-link" onclick="event.preventDefault(); cambiarVistaAuth('login')">Inicia sesión</a>
     </p>
   </div>
 
-  <div class="actions" style="margin-top:10px;">
-    <button class="btn btn-cancel" onclick="cerrarModalAuth()">Cerrar</button>
+  <div class="actions u-mt-md">
+    <button class="btn btn-cancel" onclick="cerrarModalAuth()">✕</button>
   </div>
-  <p id="authModalMsg" style="text-align:center; margin-top:10px; font-weight:600; color:var(--danger); display:none;"></p>
+  <p id="authModalMsg" class="form-msg is-error"></p>
 </div>
 
 <!-- Panel flotante del asistente -->
 <div id="assistantBox" role="dialog" aria-label="Asistente El Profe" aria-hidden="true">
   <div class="mini-header">
-    <h4>🤖 Asistente El Profe</h4>
-    <button class="small-btn" id="assistantToggleBtn" aria-label="Cerrar asistente">Cerrar ✕</button>
+    <h4>🤖 Asistente El profe</h4>
+    <button class="small-btn" id="assistantToggleBtn" aria-label="Cerrar asistente">✕</button>
   </div>
   <div id="assistantMessages" class="mini-body" role="log" aria-live="polite" aria-label="Conversación con el asistente"></div>
   <div id="assistantFooter" class="mini-footer">

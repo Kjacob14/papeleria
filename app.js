@@ -87,7 +87,7 @@ let usuarioActivo = null;
 
 /* ── AUTENTICACIÓN ───────────────────────────────────────── */
 function abrirModalAuth(vista = 'login') {
-  document.getElementById('authModalMsg').style.display = 'none';
+  document.getElementById('authModalMsg').classList.remove('is-visible');
   cambiarVistaAuth(vista);
   showModal('modalAuth');
 }
@@ -95,9 +95,9 @@ function abrirModalAuth(vista = 'login') {
 function cerrarModalAuth() { hideModal('modalAuth'); }
 
 function cambiarVistaAuth(vista) {
-  document.getElementById('auth-login-view').style.display    = vista === 'login' ? 'block' : 'none';
-  document.getElementById('auth-register-view').style.display = vista === 'registro' ? 'block' : 'none';
-  document.getElementById('authModalMsg').style.display = 'none';
+  document.getElementById('auth-login-view').classList.toggle('u-hidden', vista !== 'login');
+  document.getElementById('auth-register-view').classList.toggle('u-hidden', vista !== 'registro');
+  document.getElementById('authModalMsg').classList.remove('is-visible');
 }
 
 async function ejecutarLoginPublico() {
@@ -105,7 +105,7 @@ async function ejecutarLoginPublico() {
   const pass   = document.getElementById('authLoginPass').value.trim();
   const msg    = document.getElementById('authModalMsg');
 
-  if (!correo || !pass) { msg.textContent = 'Completa todos los campos.'; msg.style.display = 'block'; return; }
+  if (!correo || !pass) { msg.textContent = 'Completa todos los campos.'; msg.className = 'form-msg is-error is-visible'; return; }
 
   try {
     const data = await apiPost('login', { correo, contrasena: pass });
@@ -117,11 +117,11 @@ async function ejecutarLoginPublico() {
       showToast(`¡Bienvenido de nuevo, ${data.nombre}! 👋`);
     } else {
       msg.textContent = data.error || 'Credenciales incorrectas.';
-      msg.style.display = 'block';
+      msg.className = 'form-msg is-error is-visible';
     }
   } catch (e) {
     msg.textContent = 'Error de conexión con el servidor.';
-    msg.style.display = 'block';
+    msg.className = 'form-msg is-error is-visible';
   }
 }
 
@@ -131,14 +131,13 @@ async function ejecutarRegistroPublico() {
   const pass   = document.getElementById('authRegPass').value.trim();
   const msg    = document.getElementById('authModalMsg');
 
-  if (!nombre || !correo || !pass) { msg.textContent = 'Completa todos los campos.'; msg.style.display = 'block'; return; }
+  if (!nombre || !correo || !pass) { msg.textContent = 'Completa todos los campos.'; msg.className = 'form-msg is-error is-visible'; return; }
 
   try {
     const data = await apiPost('crear_cuenta', { nombre, correo, contrasena: pass });
     if (data.ok) {
-      msg.style.color = 'var(--success)';
       msg.textContent = '¡Cuenta creada! Iniciando sesión...';
-      msg.style.display = 'block';
+      msg.className = 'form-msg is-success is-visible';
       setTimeout(async () => {
         const loginData = await apiPost('login', { correo, contrasena: pass });
         if (loginData.ok) {
@@ -149,14 +148,12 @@ async function ejecutarRegistroPublico() {
         }
       }, 1200);
     } else {
-      msg.style.color = 'var(--danger)';
       msg.textContent = data.error || 'Error al crear la cuenta.';
-      msg.style.display = 'block';
+      msg.className = 'form-msg is-error is-visible';
     }
   } catch (e) {
-    msg.style.color = 'var(--danger)';
     msg.textContent = 'Error de conexión.';
-    msg.style.display = 'block';
+    msg.className = 'form-msg is-error is-visible';
   }
 }
 
@@ -165,8 +162,8 @@ function actualizarNavbarUsuario() {
   if (!container) return;
   if (usuarioActivo) {
     container.innerHTML = `
-      <span style="font-weight:700; margin-right:10px; color:var(--text);">Hola, ${escapeHtml(usuarioActivo.nombre.split(' ')[0])}</span>
-      <button class="btn danger" style="padding:4px 10px; font-size:13px;" onclick="cerrarSesionPublica()">Salir</button>`;
+      <span class="u-text-bold u-mr-md">Hola, ${escapeHtml(usuarioActivo.nombre.split(' ')[0])}</span>
+      <button class="btn danger btn-icon-sm" onclick="cerrarSesionPublica()">Salir</button>`;
   } else {
     container.innerHTML = `<button class="btn secondary" onclick="abrirModalAuth('login')">Iniciar Sesión</button>`;
   }
@@ -185,7 +182,7 @@ function actualizarBadgeMochilita() {
   if (!badge) return;
   const total = cart.reduce((sum, item) => sum + item.cantidad, 0);
   badge.textContent = total;
-  badge.style.display = total > 0 ? 'block' : 'none';
+  badge.classList.toggle('u-hidden', total <= 0);
 }
 
 /* ── HELPERS ─────────────────────────────────────────────── */
@@ -193,6 +190,24 @@ function escapeHtml(s) {
   return String(s || '').replace(/[&<>"']/g, m =>
     ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[m]));
 }
+
+/**
+ * Fase 9 (punto 2): varios productos/combos usan URLs externas (imgur)
+ * que ya no cargan. En vez de mostrar el ícono roto del navegador, se
+ * reemplaza el <img> por un placeholder inline (mismo tamaño/clase
+ * .thumb) con un ícono y el nombre del producto, para que la tarjeta
+ * siga viéndose completa y presentable. Se llama desde onerror del
+ * <img>, por eso vive en window (accesible desde HTML inline).
+ */
+function handleImgError(imgEl, nombre) {
+  const div = document.createElement('div');
+  div.className = 'thumb thumb-placeholder';
+  div.innerHTML = `
+    <span class="thumb-placeholder-icon" aria-hidden="true">🖼️</span>
+    <span class="thumb-placeholder-label">${escapeHtml(nombre || 'Sin imagen')}</span>`;
+  if (imgEl && imgEl.parentNode) imgEl.parentNode.replaceChild(div, imgEl);
+}
+window.handleImgError = handleImgError;
 
 /* ── RENDER CATÁLOGO ─────────────────────────────────────── */
 function renderCatalog(customList = null) {
@@ -208,27 +223,27 @@ function renderCatalog(customList = null) {
     const variantesHTML = (() => {
       if (!p.variantes) return '';
       return Object.entries(p.variantes).map(([key, vals]) => `
-        <div style="margin-top:6px;">
-          <label style="font-size:12px;font-weight:700;">${escapeHtml(key)}:</label>
-          <select class="variant-select" data-key="${escapeHtml(key)}" style="margin-left:4px;font-size:12px;">
+        <div class="variant-row">
+          <label>${escapeHtml(key)}:</label>
+          <select class="variant-select" data-key="${escapeHtml(key)}">
             ${vals.map(v => `<option value="${escapeHtml(v)}">${escapeHtml(v)}</option>`).join('')}
           </select>
         </div>`).join('');
     })();
 
     div.innerHTML = `
-      <img class="thumb" src="${escapeHtml(p.imagen)}" alt="${escapeHtml(p.nombre)}" loading="lazy" />
+      <img class="thumb" src="${escapeHtml(p.imagen)}" alt="${escapeHtml(p.nombre)}" loading="lazy" onerror="handleImgError(this,'${escapeHtml(p.nombre)}')" />
       <div class="item-info">
-        <h3 style="margin-top:10px;font-size:15px;">${escapeHtml(p.nombre)}</h3>
-        <div class="price" style="font-size:18px;margin:8px 0;">$${Number(p.precio).toFixed(2)}</div>
-        <div style="font-size:12px;color:var(--text-muted);">Stock: ${p.stock ?? 0}</div>
+        <h3>${escapeHtml(p.nombre)}</h3>
+        <div class="price">$${Number(p.precio).toFixed(2)}</div>
+        <div class="u-text-sm u-text-muted">Stock: ${p.stock ?? 0}</div>
         ${variantesHTML}
       </div>
-      <div style="display:flex;gap:6px;justify-content:center;margin-top:8px;">
+      <div class="u-flex-center u-gap-sm u-mt-sm">
         <button class="btn" onclick="openModalCantidad(${i})" ${p.stock <= 0 ? 'disabled' : ''}>
           ${p.stock <= 0 ? 'Sin stock' : 'Agregar'}
         </button>
-        <button class="btn secondary" style="padding:8px 10px;font-size:13px;" onclick="openModal360('${escapeHtml(p.imagen)}','${escapeHtml(p.nombre)}')">Ver 360°</button>
+        <button class="btn secondary btn-compact" onclick="openModal360('${escapeHtml(p.imagen)}','${escapeHtml(p.nombre)}')">Ver 360°</button>
       </div>`;
     container.appendChild(div);
   });
@@ -245,24 +260,24 @@ function renderCart() {
   lista.innerHTML = '';
 
   if (cart.length === 0) {
-    if (mensaje) mensaje.style.display = 'block';
+    if (mensaje) mensaje.classList.remove('u-hidden');
     if (total)   total.textContent = 'Total: $0.00';
     return;
   }
 
-  if (mensaje) mensaje.style.display = 'none';
+  if (mensaje) mensaje.classList.add('u-hidden');
   let sum = 0;
 
   cart.forEach((item, i) => {
     sum += item.precio * item.cantidad;
     const li = document.createElement('li');
-    li.style.cssText = 'display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--border);';
+    li.className = 'cart-line';
     li.innerHTML = `
       <span>${escapeHtml(item.nombre)} x${item.cantidad} — $${(item.precio * item.cantidad).toFixed(2)}</span>
-      <span style="display:flex;gap:4px;">
-        <button class="btn" style="padding:2px 8px;" onclick="changeQuantity(${i},-1)">−</button>
-        <button class="btn" style="padding:2px 8px;" onclick="changeQuantity(${i}, 1)">+</button>
-        <button class="btn btn-cancel" style="padding:2px 8px;" onclick="removeItem(${i})">✕</button>
+      <span class="u-flex u-gap-xs">
+        <button class="btn btn-icon-sm" onclick="changeQuantity(${i},-1)">−</button>
+        <button class="btn btn-icon-sm" onclick="changeQuantity(${i}, 1)">+</button>
+        <button class="btn btn-cancel btn-icon-sm" onclick="removeItem(${i})">✕</button>
       </span>`;
     lista.appendChild(li);
   });
@@ -281,15 +296,15 @@ function agregarCombo(id, nombre, precio) {
 
 function buildComboCard(c) {
   const etiquetaHTML = c.etiqueta
-    ? `<div style="position:absolute;top:-10px;right:-10px;background:var(--accent);color:var(--on-accent);padding:4px 10px;border-radius:12px;font-weight:bold;font-size:12px;box-shadow:0 2px 5px rgba(0,0,0,0.2);z-index:2;">${escapeHtml(c.etiqueta)}</div>`
+    ? `<div class="card-badge card-badge--corner">${escapeHtml(c.etiqueta)}</div>`
     : '';
   return `
-    <div class="item" style="border:2px solid var(--accent);position:relative;background:var(--surface);flex:0 0 auto;width:280px;scroll-snap-align:center;">
+    <div class="item combo-card">
       ${etiquetaHTML}
-      <img class="thumb" src="${escapeHtml(c.imagen)}" alt="${escapeHtml(c.nombre)}" style="height:150px;object-fit:contain;" loading="lazy" />
-      <h3 style="margin-top:10px;">${escapeHtml(c.nombre)}</h3>
-      <p style="font-size:13px;color:var(--text-muted);padding:0 10px;">${escapeHtml(c.descripcion)}</p>
-      <div class="price" style="font-size:18px;margin:8px 0;">$${Number(c.precio).toFixed(2)}</div>
+      <img class="thumb" src="${escapeHtml(c.imagen)}" alt="${escapeHtml(c.nombre)}" loading="lazy" onerror="handleImgError(this,'${escapeHtml(c.nombre)}')" />
+      <h3>${escapeHtml(c.nombre)}</h3>
+      <p class="u-text-sm u-text-muted">${escapeHtml(c.descripcion)}</p>
+      <div class="price">$${Number(c.precio).toFixed(2)}</div>
       <div class="actions">
         <button class="btn" onclick="agregarCombo(${c.id},'${escapeHtml(c.nombre)}',${c.precio})">Agregar a Mochilita</button>
       </div>
@@ -334,6 +349,17 @@ function openModalCantidad(index) {
 }
 
 function closeModalCantidad() { hideModal('modalCantidad'); }
+
+/* Fase 9: botones −/+ del stepper de cantidad (punto 5 — antes solo
+   existía el spinner nativo del input number, sin estilo propio). */
+function stepCantidad(delta) {
+  const input = document.getElementById('mc-cantidad');
+  const max   = parseInt(input.max) || 999;
+  let val = (parseInt(input.value) || 1) + delta;
+  if (val < 1) val = 1;
+  if (val > max) val = max;
+  input.value = val;
+}
 
 function confirmAddQuantity() {
   if (productToAddIndex === null) return;
@@ -417,18 +443,18 @@ function openTicketModal(metodoPago = "No especificado") {
   const total   = cart.reduce((t, p) => t + p.precio * p.cantidad, 0).toFixed(2);
   let extraHTML = '';
 
-  if (metodoPago === "Efectivo")             extraHTML = `<p style="margin-top:15px;">Cliente pagará en efectivo</p>`;
-  else if (metodoPago === "Tarjeta")         extraHTML = `<p style="margin-top:15px;">Pago con tarjeta de crédito</p>`;
-  else if (metodoPago === "Transferencia")   extraHTML = `<p style="margin-top:15px;">Transferencia bancaria<br>Banco: BBVA | Cuenta: 1234 5678 9012 | CLABE: 012345678901234567</p>`;
+  if (metodoPago === "Efectivo")             extraHTML = `<p class="u-mt-lg">Cliente pagará en efectivo</p>`;
+  else if (metodoPago === "Tarjeta")         extraHTML = `<p class="u-mt-lg">Pago con tarjeta de crédito</p>`;
+  else if (metodoPago === "Transferencia")   extraHTML = `<p class="u-mt-lg">Transferencia bancaria<br>Banco: BBVA | Cuenta: 1234 5678 9012 | CLABE: 012345678901234567</p>`;
 
   document.getElementById('ticketItems').innerHTML = resumen + extraHTML;
   document.getElementById('ticketTotal').textContent = total;
-  document.getElementById('ticketEmailRow').style.display = 'none';
+  document.getElementById('ticketEmailRow').classList.add('u-hidden');
   document.getElementById('ticketMsg').textContent = '';
   showModal('modalTicket');
 }
 
-function showTicketEmailInput() { document.getElementById('ticketEmailRow').style.display = 'block'; }
+function showTicketEmailInput() { document.getElementById('ticketEmailRow').classList.remove('u-hidden'); }
 function closeModalTicket()     { hideModal('modalTicket'); }
 
 async function finishTicketWithoutEmail() {
@@ -529,19 +555,13 @@ async function sendTicketByEmail() {
  */
 function crearDialogoFlotante(etiqueta, innerHTML) {
   const overlay = document.createElement('div');
-  Object.assign(overlay.style, {
-    position: 'fixed', inset: '0', background: 'rgba(0,0,0,0.35)',
-    zIndex: '2000', display: 'flex', alignItems: 'center', justifyContent: 'center',
-  });
+  overlay.className = 'flyout-overlay';
 
   const box = document.createElement('div');
+  box.className = 'flyout-box';
   box.setAttribute('role', 'dialog');
   box.setAttribute('aria-modal', 'true');
   box.setAttribute('aria-label', etiqueta);
-  Object.assign(box.style, {
-    background: 'var(--surface)', padding: '25px', borderRadius: '12px',
-    boxShadow: '0 4px 20px rgba(0,0,0,0.3)', textAlign: 'center', maxWidth: '90%',
-  });
   box.innerHTML = innerHTML;
   overlay.appendChild(box);
   document.body.appendChild(overlay);
@@ -571,13 +591,27 @@ function crearDialogoFlotante(etiqueta, innerHTML) {
   return { box, cerrar };
 }
 
+/**
+ * Fase 9 (punto 6): antes se podía completar una compra sin haber
+ * iniciado sesión — el carrito y la navegación son libres, pero
+ * confirmar un pedido real (que descuenta stock y queda registrado)
+ * ahora requiere estar identificado. Si no hay sesión activa, se
+ * abre directamente el modal de login/registro en vez de dejar
+ * avanzar el flujo de compra.
+ */
 function confirmarPedido() {
   if (cart.length === 0) { showToast("Tu mochilita está vacía 👜"); return; }
 
+  if (!usuarioActivo) {
+    showToast('Inicia sesión para confirmar tu pedido 🔒');
+    abrirModalAuth('login');
+    return;
+  }
+
   const { box, cerrar } = crearDialogoFlotante('Confirmar pedido', `
-    <h3 style="margin-bottom:10px;">¿Confirmar pedido? 🛍️</h3>
+    <h3>¿Confirmar pedido? 🛍️</h3>
     <p>Total: <b>$${cart.reduce((t,p)=>t+p.precio*p.cantidad,0).toFixed(2)}</b></p>
-    <div style="margin-top:15px;display:flex;justify-content:center;gap:10px;">
+    <div class="actions">
       <button id="confirmYes" class="btn">Sí, confirmar</button>
       <button id="confirmNo"  class="btn secondary">Cancelar</button>
     </div>`);
@@ -588,13 +622,13 @@ function confirmarPedido() {
 
 function seleccionarMetodoPago() {
   const { box, cerrar } = crearDialogoFlotante('Método de pago', `
-    <h3 style="margin-bottom:15px;">Método de pago 💳</h3>
-    <div style="display:flex;justify-content:center;gap:10px;flex-wrap:wrap;">
+    <h3>Método de pago 💳</h3>
+    <div class="u-flex-center u-gap-md u-flex-wrap">
       <button class="btn" id="pagoEfectivo">Efectivo</button>
       <button class="btn" id="pagoTarjeta">Tarjeta</button>
       <button class="btn" id="pagoTransferencia">Transferencia</button>
     </div>
-    <button class="btn btn-cancel" id="pagoCancel" style="margin-top:14px;">Cancelar</button>`);
+    <button class="btn btn-cancel u-mt-md" id="pagoCancel">Cancelar</button>`);
 
   box.querySelector('#pagoEfectivo').onclick      = () => { cerrar(); openTicketModal("Efectivo"); };
   box.querySelector('#pagoTarjeta').onclick       = () => { cerrar(); openTicketModal("Tarjeta"); };
@@ -710,7 +744,7 @@ function stopSpin()      {
 
 function close360View(e) {
   if (e.target.id === 'viewer360Modal')
-    document.getElementById('viewer360Modal').classList.remove('active');
+    document.getElementById('viewer360Modal').classList.remove('show');
 }
 
 /* ── ASISTENTE VIRTUAL ───────────────────────────────────── */
@@ -876,8 +910,8 @@ let isDragging = false, startX360 = 0, currentRotation = 0;
 function setupViewerDrag() {
   const img = document.getElementById('viewer360Img');
   if (!img) return;
-  img.addEventListener('mousedown',  e => { isDragging = true;  startX360 = e.clientX; img.style.cursor = 'grabbing'; });
-  img.addEventListener('mouseup',    () => { isDragging = false; img.style.cursor = 'grab'; });
+  img.addEventListener('mousedown',  e => { isDragging = true;  startX360 = e.clientX; img.classList.remove('viewer-grab'); img.classList.add('viewer-grabbing'); });
+  img.addEventListener('mouseup',    () => { isDragging = false; img.classList.remove('viewer-grabbing'); img.classList.add('viewer-grab'); });
   img.addEventListener('mouseleave', () => { isDragging = false; });
   img.addEventListener('mousemove',  e => {
     if (!isDragging) return;
@@ -890,14 +924,11 @@ function setupViewerDrag() {
 /* ── INDICADOR DE SECCIÓN ACTIVA ────────────────────────── */
 function updateNavActive(hash) {
   document.querySelectorAll('.nav-right a[href]').forEach(a => {
-    const isActive = a.getAttribute('href') === hash;
-    a.style.borderBottom  = isActive ? '2px solid var(--accent-dark)' : '2px solid transparent';
-    a.style.paddingBottom = '2px';
-    a.style.color         = isActive ? 'var(--accent-dark)' : '';
+    a.classList.toggle('is-active', a.getAttribute('href') === hash);
   });
-  const mochilaLink = document.querySelector('a[href="#mochilita"]');
-  if (mochilaLink) {
-    mochilaLink.style.filter = hash === '#mochilita' ? 'drop-shadow(0 0 5px #F1A0B6)' : '';
+  const mochilaImg = document.getElementById('nav-img-mochila');
+  if (mochilaImg) {
+    mochilaImg.classList.toggle('is-active-cart', hash === '#mochilita');
   }
 }
 
@@ -921,17 +952,17 @@ function router() {
 
     const combosHTML = combos.length
       ? combos.map(buildComboCard).join('')
-      : '<div style="color:var(--text-muted);padding:20px;">No hay paquetes disponibles en este momento.</div>';
+      : '<div class="u-empty-state">No hay paquetes disponibles en este momento.</div>';
 
     const popularesHTML = populares.map((p, i) => {
       const idx = products.indexOf(p);
       return `
-        <div class="item" style="position:relative;">
-          <div style="position:absolute;top:8px;left:8px;background:var(--accent-secondary);color:var(--on-accent);font-size:11px;font-weight:800;padding:3px 8px;border-radius:10px;">⭐ Popular</div>
-          <img class="thumb" src="${escapeHtml(p.imagen)}" alt="${escapeHtml(p.nombre)}" loading="lazy" />
-          <h3 style="margin-top:10px;font-size:14px;">${escapeHtml(p.nombre)}</h3>
+        <div class="item u-relative">
+          <div class="card-badge">⭐ Popular</div>
+          <img class="thumb" src="${escapeHtml(p.imagen)}" alt="${escapeHtml(p.nombre)}" loading="lazy" onerror="handleImgError(this,'${escapeHtml(p.nombre)}')" />
+          <h3>${escapeHtml(p.nombre)}</h3>
           <div class="price">$${Number(p.precio).toFixed(2)}</div>
-          <div style="font-size:12px;color:var(--text-muted);margin-bottom:6px;">Stock: ${p.stock ?? 0}</div>
+          <div class="u-text-sm u-text-muted u-mb-md">Stock: ${p.stock ?? 0}</div>
           <button class="btn" onclick="openModalCantidad(${idx})" ${p.stock <= 0 ? 'disabled' : ''}>
             ${p.stock <= 0 ? 'Sin stock' : 'Agregar'}
           </button>
@@ -939,24 +970,24 @@ function router() {
     }).join('');
 
     appContent.innerHTML = `
-      <section class="hero" style="background:linear-gradient(135deg, var(--accent-secondary) 0%, var(--accent) 100%);padding:50px 20px;box-shadow:0 4px 15px rgba(41,59,93,0.1);">
+      <section class="hero-home">
         <div class="container-full">
-          <h1 style="font-size:42px;color:var(--on-accent);">¡Bienvenido a Papelería El Profe!</h1>
-          <p style="font-size:18px;color:var(--on-accent);font-weight:600;margin-top:10px;opacity:0.85;">Útiles escolares y material de oficina al mejor precio.</p>
-          <a href="#catalogo" class="btn secondary" style="margin-top:18px;display:inline-block;padding:12px 28px;font-size:16px;text-decoration:none;">Ver Catálogo Completo</a>
+          <h1>¡Bienvenido a Papelería El Profe!</h1>
+          <p>Útiles escolares y material de oficina al mejor precio.</p>
+          <a href="#catalogo" class="btn secondary">Ver Catálogo Completo</a>
         </div>
       </section>
 
-      <section style="padding:30px 20px 10px;">
+      <section class="home-section">
         <div class="container-full">
-          <h2 style="margin-bottom:18px;color:var(--text);">🎒 Paquetes Especiales</h2>
+          <h2>🎒 Paquetes Especiales</h2>
           <div class="carousel-container" id="combosCarouselInicio">${combosHTML}</div>
         </div>
       </section>
 
-      <section style="padding:30px 20px 50px;">
+      <section class="home-section">
         <div class="container-full">
-          <h2 style="margin-bottom:18px;color:var(--text);">⭐ Lo Más Pedido en la Escuela</h2>
+          <h2>⭐ Lo Más Pedido en la Escuela</h2>
           <div class="grid">${popularesHTML}</div>
         </div>
       </section>
@@ -970,7 +1001,7 @@ function router() {
     appContent.innerHTML = `
       <section id="productos">
         <div class="container-full">
-          <h2 style="margin-bottom:20px;color:var(--text);">Catálogo Completo</h2>
+          <h2 class="u-mb-md">Catálogo Completo</h2>
           <div class="grid" id="catalogo"></div>
         </div>
       </section>
@@ -985,9 +1016,9 @@ function router() {
         <div class="container-full">
           <h3>Mochilita</h3>
           <ul id="listaMochilita"></ul>
-          <div id="mensajeCarrito" style="display:none;">Aún no has agregado productos.</div>
-          <div id="totalCarrito" style="font-weight:bold;text-align:right;margin-top:10px;">Total: $0.00</div>
-          <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:10px;">
+          <div id="mensajeCarrito" class="u-hidden">Aún no has agregado productos.</div>
+          <div id="totalCarrito" class="u-text-bold u-text-right u-mt-md">Total: $0.00</div>
+          <div class="u-flex-end u-gap-md u-mt-md">
             <button class="btn" onclick="confirmarPedido()">Confirmar Pedido</button>
           </div>
         </div>
