@@ -261,6 +261,31 @@ header.navbar.navbar-brand .brand-subtitle {
 header.navbar.navbar-brand .brand-title { font-size: 17px; }
 header.navbar.navbar-brand .brand-subtitle { opacity: 0.72; }
 
+/* Fase 10: header.navbar.navbar-brand usa --ink como fondo fijo, sin
+   importar el tema activo (es la identidad de marca del panel admin,
+   no una superficie que deba cambiar con claro/oscuro). Los botones
+   .btn.secondary y .theme-toggle, en cambio, están pensados por
+   defecto para vivir sobre --surface/--bg — su color de texto normal
+   (var(--text)) se vuelve casi ilegible sobre --ink en modo claro,
+   donde --text es oscuro. Se fuerza aquí un contraste claro fijo,
+   igual que ya se hace con .brand-title/.brand-subtitle arriba. */
+header.navbar.navbar-brand .btn.secondary {
+    color: var(--cloud);
+    border-color: rgba(245, 241, 230, 0.35);
+}
+header.navbar.navbar-brand .btn.secondary:hover {
+    border-color: var(--sand);
+    background: rgba(245, 241, 230, 0.08);
+}
+header.navbar.navbar-brand .theme-toggle {
+    border-color: rgba(245, 241, 230, 0.35);
+    background: rgba(245, 241, 230, 0.08);
+    color: var(--cloud);
+}
+header.navbar.navbar-brand .theme-toggle:hover {
+    background: rgba(245, 241, 230, 0.16);
+}
+
 .brand { display: flex; align-items: center; gap: 15px; }
 .brand-title { color: var(--text); font-size: 15px; }
 .brand-subtitle { font-size: 12px; }
@@ -827,7 +852,7 @@ footer.footer-brand {
     font-weight: 700;
     font-size: 16px;
     padding: 0;
-    appearance: textfield;
+    -moz-appearance: textfield;
 }
 .qty-input::-webkit-outer-spin-button,
 .qty-input::-webkit-inner-spin-button {

@@ -10,16 +10,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@500;600;700&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
-<script>
-  (function () {
-    var guardado = localStorage.getItem('tema');
-    if (guardado === 'dark' || guardado === 'light') {
-      document.documentElement.setAttribute('data-theme', guardado);
-    }
-    // Si no hay preferencia guardada, no se setea nada: manda
-    // @media (prefers-color-scheme) definido en styles.css.
-  })();
-</script>
+<script src="theme.js"></script>
 <link rel="stylesheet" href="styles.css?v=8">
 </head>
 <body>
@@ -43,7 +34,6 @@
          type="button"
          aria-label="Cambiar a modo oscuro"
          title="Cambiar tema"
-          onclick="toggleTema()"
         >🌙</button>
       <a href="#mochilita" title="Ver Mochilita" aria-label="Ver mi mochilita, carrito de compras" class="cart-link">
         <img src="Mochila.png" alt="" id="nav-img-mochila" class="cart-icon">
@@ -157,7 +147,7 @@
   </div>
 
   <div class="actions u-mt-md">
-    <button class="btn btn-cancel" onclick="cerrarModalAuth()">✕</button>
+    <button class="btn btn-cancel" onclick="cerrarModalAuth()">Cerrar</button>
   </div>
   <p id="authModalMsg" class="form-msg is-error"></p>
 </div>
@@ -165,8 +155,8 @@
 <!-- Panel flotante del asistente -->
 <div id="assistantBox" role="dialog" aria-label="Asistente El Profe" aria-hidden="true">
   <div class="mini-header">
-    <h4>🤖 Asistente El profe</h4>
-    <button class="small-btn" id="assistantToggleBtn" aria-label="Cerrar asistente">✕</button>
+    <h4>🤖 Asistente El Profe</h4>
+    <button class="small-btn" id="assistantToggleBtn" aria-label="Cerrar asistente">Cerrar ✕</button>
   </div>
   <div id="assistantMessages" class="mini-body" role="log" aria-live="polite" aria-label="Conversación con el asistente"></div>
   <div id="assistantFooter" class="mini-footer">
@@ -182,29 +172,6 @@
 <button class="voice-btn"   id="voiceBtn"   title="Asistente de voz" aria-label="Activar asistente de voz" aria-pressed="false">&#127908;</button>
 
 <script src="app.js"></script>
-<script>
-  function aplicarIconoTema() {
-    var btn = document.getElementById('themeToggleBtn');
-    if (!btn) return;
-    var esOscuro = document.documentElement.getAttribute('data-theme') === 'dark'
-      || (!document.documentElement.getAttribute('data-theme')
-          && window.matchMedia('(prefers-color-scheme: dark)').matches);
-    btn.textContent = esOscuro ? '☀️' : '🌙';
-    btn.setAttribute('aria-label', esOscuro ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro');
-  }
- 
-  function toggleTema() {
-    var actual = document.documentElement.getAttribute('data-theme');
-    var esOscuroActual = actual === 'dark'
-      || (!actual && window.matchMedia('(prefers-color-scheme: dark)').matches);
-    var nuevo = esOscuroActual ? 'light' : 'dark';
-    document.documentElement.setAttribute('data-theme', nuevo);
-    localStorage.setItem('tema', nuevo);
-    aplicarIconoTema();
-  }
- 
-  document.addEventListener('DOMContentLoaded', aplicarIconoTema);
-</script>
 
 </body>
 </html>

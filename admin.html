@@ -7,16 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@500;600;700&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <script>
-  (function () {
-    var guardado = localStorage.getItem('tema');
-    if (guardado === 'dark' || guardado === 'light') {
-      document.documentElement.setAttribute('data-theme', guardado);
-    }
-    // Si no hay preferencia guardada, no se setea nada: manda
-    // @media (prefers-color-scheme) definido en styles.css.
-  })();
-</script>
+  <script src="theme.js"></script>
   <link rel="stylesheet" href="styles.css?v=8">
 </head>
 <body class="admin-body">
@@ -32,6 +23,13 @@
       </div>
     </div>
     <nav class="nav-right">
+      <button
+        id="themeToggleBtn"
+        class="theme-toggle"
+        type="button"
+        aria-label="Cambiar a modo oscuro"
+        title="Cambiar tema"
+      >🌙</button>
       <button id="btnLogout" class="btn danger u-hidden" onclick="logoutAdmin()">Cerrar sesión</button>
       <a href="index.php" class="btn secondary">Ver Tienda</a>
     </nav>
