@@ -7,24 +7,6 @@ emailjs.init("Rz7f3kZkPxlwT1bL0");
 /* ── Helpers de API ──────────────────────────────────────── */
 const API = 'api.php';
 
-/**
- * Fase 3: el backend ahora responde con códigos HTTP reales (400,
- * 401, 404, 409, etc.) además del 200. Antes, cualquier código
- * distinto de 2xx hacía throw sin leer el cuerpo, así que mensajes
- * como "Correo o contraseña incorrectos" nunca llegaban a mostrarse
- * (el usuario solo veía "Error de conexión con el servidor").
- *
- * Ahora: siempre se intenta leer el JSON de la respuesta, sin
- * importar el código HTTP. El JSON del backend siempre trae
- * { ok: true/false, error?: '...' }, así que quien llama a apiGet/
- * apiPost puede seguir revisando data.ok / data.error exactamente
- * igual que antes.
- *
- * Solo se lanza una excepción real (catch) cuando la respuesta NO
- * se puede interpretar como JSON — eso sí es un fallo de conexión
- * genuino (servidor caído, XAMPP apagado, etc.), no un error de
- * validación esperado.
- */
 async function apiGet(action) {
   const res = await fetch(`${API}?action=${action}`);
   let data;
@@ -84,6 +66,17 @@ let cart     = [];
 let productToAddIndex  = null;
 let editingProductIndex = null;
 let usuarioActivo = null;
+
+/* ── HELPER i18n ── */
+function getDbText(texto) {
+  try {
+    if (typeof texto === 'string' && texto.startsWith('{')) {
+      const obj = JSON.parse(texto);
+      return obj[typeof currentLang !== 'undefined' ? currentLang : 'es'] || obj['es'] || '';
+    }
+  } catch (e) {}
+  return texto;
+}
 
 /* ── AUTENTICACIÓN ───────────────────────────────────────── */
 function abrirModalAuth(vista = 'login') {
@@ -165,7 +158,7 @@ function actualizarNavbarUsuario() {
       <span class="u-text-bold u-mr-md">Hola, ${escapeHtml(usuarioActivo.nombre.split(' ')[0])}</span>
       <button class="btn danger btn-icon-sm" onclick="cerrarSesionPublica()">Salir</button>`;
   } else {
-    container.innerHTML = `<button class="btn secondary" onclick="abrirModalAuth('login')">Iniciar Sesión</button>`;
+    container.innerHTML = `<button class="btn secondary" onclick="abrirModalAuth('login')" data-i18n="nav.login">${typeof t === 'function' ? t('nav.login') : 'Iniciar Sesión'}</button>`;
   }
 }
 
@@ -191,14 +184,6 @@ function escapeHtml(s) {
     ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[m]));
 }
 
-/**
- * Fase 9 (punto 2): varios productos/combos usan URLs externas (imgur)
- * que ya no cargan. En vez de mostrar el ícono roto del navegador, se
- * reemplaza el <img> por un placeholder inline (mismo tamaño/clase
- * .thumb) con un ícono y el nombre del producto, para que la tarjeta
- * siga viéndose completa y presentable. Se llama desde onerror del
- * <img>, por eso vive en window (accesible desde HTML inline).
- */
 function handleImgError(imgEl, nombre) {
   const div = document.createElement('div');
   div.className = 'thumb thumb-placeholder';
@@ -224,24 +209,25 @@ function renderCatalog(customList = null) {
       if (!p.variantes) return '';
       return Object.entries(p.variantes).map(([key, vals]) => `
         <div class="variant-row">
-          <label>${escapeHtml(key)}:</label>
+          <label>${escapeHtml(getDbText(key))}:</label>
           <select class="variant-select" data-key="${escapeHtml(key)}">
-            ${vals.map(v => `<option value="${escapeHtml(v)}">${escapeHtml(v)}</option>`).join('')}
+            ${vals.map(v => `<option value="${escapeHtml(v)}">${escapeHtml(getDbText(v))}</option>`).join('')}
           </select>
         </div>`).join('');
     })();
 
     div.innerHTML = `
-      <img class="thumb" src="${escapeHtml(p.imagen)}" alt="${escapeHtml(p.nombre)}" loading="lazy" onerror="handleImgError(this,'${escapeHtml(p.nombre)}')" />
-      <div class="item-info">
-        <h3>${escapeHtml(p.nombre)}</h3>
+       <img class="thumb" src="${escapeHtml(p.imagen)}" alt="${escapeHtml(getDbText(p.nombre))}" loading="lazy" onerror="handleImgError(this,'${escapeHtml(getDbText(p.nombre))}')" />
+       <div class="item-info">
+        <h3>${escapeHtml(getDbText(p.nombre))}</h3>
         <div class="price">$${Number(p.precio).toFixed(2)}</div>
         <div class="u-text-sm u-text-muted">Stock: ${p.stock ?? 0}</div>
         ${variantesHTML}
       </div>
       <div class="u-flex-center u-gap-sm u-mt-sm">
         <button class="btn" onclick="openModalCantidad(${i})" ${p.stock <= 0 ? 'disabled' : ''}>
-          ${p.stock <= 0 ? 'Sin stock' : 'Agregar'}
+         ${p.stock <= 0 ? (typeof t === 'function' ? t('catalog.out_of_stock') : 'Sin stock') : (typeof t === 'function' ? t('catalog.add_btn') : 'Agregar')}
+         </button>
       </div>`;
     container.appendChild(div);
   });
@@ -257,9 +243,11 @@ function renderCart() {
 
   lista.innerHTML = '';
 
+  const totalText = typeof t === 'function' ? t('cart.total') : 'Total:';
+
   if (cart.length === 0) {
     if (mensaje) mensaje.classList.remove('u-hidden');
-    if (total)   total.textContent = 'Total: $0.00';
+    if (total)   total.textContent = `${totalText} $0.00`;
     return;
   }
 
@@ -271,8 +259,7 @@ function renderCart() {
     const li = document.createElement('li');
     li.className = 'cart-line';
     li.innerHTML = `
-      <span>${escapeHtml(item.nombre)} x${item.cantidad} — $${(item.precio * item.cantidad).toFixed(2)}</span>
-      <span class="u-flex u-gap-xs">
+        <span>${escapeHtml(getDbText(item.nombre))} x${item.cantidad} — $${(item.precio * item.cantidad).toFixed(2)}</span>      <span class="u-flex u-gap-xs">
         <button class="btn btn-icon-sm" onclick="changeQuantity(${i},-1)">−</button>
         <button class="btn btn-icon-sm" onclick="changeQuantity(${i}, 1)">+</button>
         <button class="btn btn-cancel btn-icon-sm" onclick="removeItem(${i})">✕</button>
@@ -280,7 +267,7 @@ function renderCart() {
     lista.appendChild(li);
   });
 
-  if (total) total.textContent = `Total: $${sum.toFixed(2)}`;
+  if (total) total.textContent = `${totalText} $${sum.toFixed(2)}`;
 }
 
 /* ── COMBOS ──────────────────────────────────────────────── */
@@ -294,17 +281,17 @@ function agregarCombo(id, nombre, precio) {
 
 function buildComboCard(c) {
   const etiquetaHTML = c.etiqueta
-    ? `<div class="card-badge card-badge--corner">${escapeHtml(c.etiqueta)}</div>`
+    ? `<div class="card-badge card-badge--corner">${escapeHtml(getDbText(c.etiqueta))}</div>`
     : '';
   return `
     <div class="item combo-card">
       ${etiquetaHTML}
-      <img class="thumb" src="${escapeHtml(c.imagen)}" alt="${escapeHtml(c.nombre)}" loading="lazy" onerror="handleImgError(this,'${escapeHtml(c.nombre)}')" />
-      <h3>${escapeHtml(c.nombre)}</h3>
-      <p class="u-text-sm u-text-muted">${escapeHtml(c.descripcion)}</p>
+      <img class="thumb" src="${escapeHtml(c.imagen)}" alt="${escapeHtml(getDbText(c.nombre))}" loading="lazy" onerror="handleImgError(this,'${escapeHtml(getDbText(c.nombre))}')" />
+      <h3>${escapeHtml(getDbText(c.nombre))}</h3>
+      <p class="u-text-sm u-text-muted">${escapeHtml(getDbText(c.descripcion))}</p>
       <div class="price">$${Number(c.precio).toFixed(2)}</div>
       <div class="actions">
-        <button class="btn" onclick="agregarCombo(${c.id},'${escapeHtml(c.nombre)}',${c.precio})">Agregar a Mochilita</button>
+        <button class="btn" onclick="agregarCombo(${c.id},'${escapeHtml(c.nombre)}',${c.precio})">${typeof t === 'function' ? t('catalog.add_btn') : 'Agregar'}</button>
       </div>
     </div>`;
 }
@@ -340,7 +327,7 @@ function openModalCantidad(index) {
   const p = products[index];
   if (!p || p.stock <= 0) { showToast('Sin stock disponible'); return; }
   productToAddIndex = index;
-  document.getElementById('mc-title').textContent = `¿Cuántas unidades de "${p.nombre}"?`;
+  document.getElementById('mc-title').textContent = `${typeof t === 'function' ? t('modals.qty_title') : '¿Cuántas unidades de'} "${getDbText(p.nombre)}"?`;
   document.getElementById('mc-cantidad').value = 1;
   document.getElementById('mc-cantidad').max = p.stock;
   showModal('modalCantidad');
@@ -348,8 +335,6 @@ function openModalCantidad(index) {
 
 function closeModalCantidad() { hideModal('modalCantidad'); }
 
-/* Fase 9: botones −/+ del stepper de cantidad (punto 5 — antes solo
-   existía el spinner nativo del input number, sin estilo propio). */
 function stepCantidad(delta) {
   const input = document.getElementById('mc-cantidad');
   const max   = parseInt(input.max) || 999;
@@ -461,10 +446,6 @@ async function finishTicketWithoutEmail() {
   const total = cart.reduce((s, i) => s + i.precio * i.cantidad, 0).toFixed(2);
   const order = { id, fecha: new Date().toLocaleString(), items, total, correo: '', carrito: cart };
 
-  // Fase 3: el backend ahora valida stock y precios estrictamente y
-  // puede rechazar el pedido (ej. alguien más compró el último
-  // artículo mientras estaba en el carrito). Antes esto casi no se
-  // detectaba; ahora hay que revisar data.ok en vez de asumir éxito.
   let data;
   try {
     data = await apiPost('guardar_pedido', order);
@@ -511,10 +492,6 @@ async function sendTicketByEmail() {
   const items = cart.map(i => `${i.nombre} x${i.cantidad} - $${(i.precio*i.cantidad).toFixed(2)}`).join('; ');
   const order = { id, fecha: new Date().toLocaleString(), items, total: total.toFixed(2), correo, carrito: cart };
 
-  // Fase 3: mismo cuidado que en finishTicketWithoutEmail — el correo
-  // ya se envió (o se intentó) arriba, pero el pedido en sí puede ser
-  // rechazado por el backend (stock insuficiente, producto eliminado,
-  // etc.). Se informa al usuario en vez de asumir éxito silencioso.
   let data;
   try {
     data = await apiPost('guardar_pedido', order);
@@ -543,14 +520,6 @@ async function sendTicketByEmail() {
 }
 
 /* ── CONFIRMAR PEDIDO ────────────────────────────────────── */
-/**
- * Fase 6: estos dos diálogos se armaban con document.createElement
- * fuera del sistema de modales — sin overlay, sin role="dialog", sin
- * foco gestionado y sin cierre por Escape. crearDialogoFlotante()
- * centraliza eso reutilizando la misma trampa de foco/Escape que ya
- * usan showModal/hideModal, para que el comportamiento de teclado
- * sea idéntico en todo el sitio.
- */
 function crearDialogoFlotante(etiqueta, innerHTML) {
   const overlay = document.createElement('div');
   overlay.className = 'flyout-overlay';
@@ -589,14 +558,6 @@ function crearDialogoFlotante(etiqueta, innerHTML) {
   return { box, cerrar };
 }
 
-/**
- * Fase 9 (punto 6): antes se podía completar una compra sin haber
- * iniciado sesión — el carrito y la navegación son libres, pero
- * confirmar un pedido real (que descuenta stock y queda registrado)
- * ahora requiere estar identificado. Si no hay sesión activa, se
- * abre directamente el modal de login/registro en vez de dejar
- * avanzar el flujo de compra.
- */
 function confirmarPedido() {
   if (cart.length === 0) { showToast("Tu mochilita está vacía 👜"); return; }
 
@@ -634,21 +595,7 @@ function seleccionarMetodoPago() {
   box.querySelector('#pagoCancel').onclick        = () => { cerrar(); showToast("Pago cancelado"); };
 }
 
-/* ── MODAL HELPERS (accesibles) ──────────────────────────────
- * Fase 6: antes solo alternaban 'display' y un aria-hidden estático.
- * Un usuario de teclado o de lector de pantalla podía:
- *   - quedar navegando "detrás" del modal (el foco nunca se movía
- *     adentro al abrir),
- *   - tabular fuera del modal hacia elementos ocultos detrás,
- *   - no tener forma de cerrar con Escape,
- *   - perder su posición original al cerrar (el foco no regresaba
- *     al botón que abrió el modal).
- * Ahora: al abrir, se guarda el elemento que tenía el foco, se marca
- * el modal con role="dialog" + aria-modal="true", se mueve el foco
- * al primer elemento enfocable de adentro, se atrapa Tab/Shift+Tab
- * dentro del modal, y Escape cierra. Al cerrar, se libera todo eso y
- * el foco regresa a quien abrió el modal.
- */
+/* ── MODAL HELPERS (accesibles) ────────────────────────────── */
 let elementoAntesDelModal = null;
 let modalActivoId = null;
 
@@ -957,12 +904,12 @@ function router() {
       return `
         <div class="item u-relative">
           <div class="card-badge">⭐ Popular</div>
-          <img class="thumb" src="${escapeHtml(p.imagen)}" alt="${escapeHtml(p.nombre)}" loading="lazy" onerror="handleImgError(this,'${escapeHtml(p.nombre)}')" />
-          <h3>${escapeHtml(p.nombre)}</h3>
+          <img class="thumb" src="${escapeHtml(p.imagen)}" alt="${escapeHtml(getDbText(p.nombre))}" loading="lazy" onerror="handleImgError(this,'${escapeHtml(getDbText(p.nombre))}')" />
+          <h3>${escapeHtml(getDbText(p.nombre))}</h3>
           <div class="price">$${Number(p.precio).toFixed(2)}</div>
           <div class="u-text-sm u-text-muted u-mb-md">Stock: ${p.stock ?? 0}</div>
           <button class="btn" onclick="openModalCantidad(${idx})" ${p.stock <= 0 ? 'disabled' : ''}>
-            ${p.stock <= 0 ? 'Sin stock' : 'Agregar'}
+            ${p.stock <= 0 ? (typeof t === 'function' ? t('catalog.out_of_stock') : 'Sin stock') : (typeof t === 'function' ? t('catalog.add_btn') : 'Agregar')}
           </button>
         </div>`;
     }).join('');
@@ -970,22 +917,22 @@ function router() {
     appContent.innerHTML = `
       <section class="hero-home">
         <div class="container-full">
-          <h1>¡Bienvenido a Papelería El Profe!</h1>
-          <p>Útiles escolares y material de oficina al mejor precio.</p>
-          <a href="#catalogo" class="btn secondary">Ver Catálogo Completo</a>
+          <h1 data-i18n="home.welcome">¡Bienvenido a Papelería El Profe!</h1>
+          <p data-i18n="home.subtitle">Útiles escolares y material de oficina al mejor precio.</p>
+          <a href="#catalogo" class="btn secondary" data-i18n="home.view_catalog">Ver Catálogo Completo</a>
         </div>
       </section>
 
       <section class="home-section">
         <div class="container-full">
-          <h2>🎒 Paquetes Especiales</h2>
+          <h2 data-i18n="home.packages">🎒 Paquetes Especiales</h2>
           <div class="carousel-container" id="combosCarouselInicio">${combosHTML}</div>
         </div>
       </section>
 
       <section class="home-section">
         <div class="container-full">
-          <h2>⭐ Lo Más Pedido en la Escuela</h2>
+          <h2><span data-i18n="home.popular">⭐ Lo Más Pedido en la Escuela</span></h2>
           <div class="grid">${popularesHTML}</div>
         </div>
       </section>
@@ -999,7 +946,7 @@ function router() {
     appContent.innerHTML = `
       <section id="productos">
         <div class="container-full">
-          <h2 class="u-mb-md">Catálogo Completo</h2>
+          <h2 class="u-mb-md" data-i18n="catalog.title">Catálogo Completo</h2>
           <div class="grid" id="catalogo"></div>
         </div>
       </section>
@@ -1012,12 +959,12 @@ function router() {
     appContent.innerHTML = `
       <section id="mochilita">
         <div class="container-full">
-          <h3>Mochilita</h3>
+          <h3 data-i18n="cart.title">Mochilita</h3>
           <ul id="listaMochilita"></ul>
-          <div id="mensajeCarrito" class="u-hidden">Aún no has agregado productos.</div>
+          <div id="mensajeCarrito" class="u-hidden" data-i18n="cart.empty">Aún no has agregado productos.</div>
           <div id="totalCarrito" class="u-text-bold u-text-right u-mt-md">Total: $0.00</div>
           <div class="u-flex-end u-gap-md u-mt-md">
-            <button class="btn" onclick="confirmarPedido()">Confirmar Pedido</button>
+            <button class="btn" onclick="confirmarPedido()" data-i18n="cart.checkout">Confirmar Pedido</button>
           </div>
         </div>
       </section>`;
@@ -1036,6 +983,8 @@ function router() {
         </div>
       </section>`;
   }
+
+  if (typeof updateStaticDOM === 'function') updateStaticDOM();
 }
 
 window.addEventListener('hashchange', router);
@@ -1050,11 +999,17 @@ document.addEventListener('DOMContentLoaded', async () => {
     console.error("Error cargando datos iniciales:", e);
   }
 
-  // Siempre empezar en #inicio sin importar el hash guardado en el navegador
   history.replaceState(null, null, '#inicio');
   router();
   setupSpeechRecognition();
   setupAssistantBox();
   setupFloatingButtons();
   setupViewerDrag();
+});
+
+/* ── EVENTO DE CAMBIO DE IDIOMA ── */
+document.addEventListener('languageChanged', () => {
+  renderCatalog();
+  renderCart();
+  router(); 
 });

@@ -11,6 +11,7 @@
 <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
 <script src="theme.js"></script>
+<script src="i18n.js"></script> 
 <link rel="stylesheet" href="styles.css?v=8">
 </head>
 <body>
@@ -21,13 +22,22 @@
       <img src="papeleria.png" alt="Logo Papelería El Profe">
     </div>
       <div>
-        <div class="brand-title u-text-bold">Papelería</div>
-        <div class="brand-subtitle u-text-sm u-text-muted">Útiles escolares y Material de oficina</div>
+        <div class="brand-title u-text-bold" data-i18n="nav.brand_title">Papelería</div>
+        <div class="brand-subtitle u-text-sm u-text-muted" data-i18n="nav.brand_subtitle">Útiles escolares y Material de oficina</div>
       </div>
     </div>
     <nav class="nav-right" id="adminPanelToggleContainer">
-      <a href="#inicio">Inicio</a>
-      <a href="#catalogo">Catálogo</a>
+      
+      <a href="#inicio" data-i18n="nav.home">Inicio</a>
+      <a href="#catalogo" data-i18n="nav.catalog">Catálogo</a>
+
+      <select id="langSelector" class="form-input" style="width: auto; padding: 6px; margin: 0; cursor: pointer;" onchange="changeLanguage(event)">
+        <option value="es">ES</option>
+        <option value="en">EN</option>
+        <option value="fr">FR</option>
+        <option value="zh">ZH</option>
+      </select>
+
       <button
         id="themeToggleBtn"
         class="theme-toggle"
@@ -41,10 +51,10 @@
       </a>
       
       <label for="searchBox" class="sr-only">Buscar producto</label>
-      <input type="text" id="searchBox" placeholder="Buscar producto..." oninput="filterProducts(this.value)" />
+      <input type="text" id="searchBox" data-i18n-placeholder="nav.search" placeholder="Buscar producto..." oninput="filterProducts(this.value)" />
       
       <div id="auth-nav-container">
-        <button class="btn secondary" onclick="abrirModalAuth('login')">Iniciar Sesión</button>
+        <button class="btn secondary" onclick="abrirModalAuth('login')" data-i18n="nav.login">Iniciar Sesión</button>
       </div>
     </nav>
   </header>
@@ -52,7 +62,6 @@
   <a href="#app-content" class="skip-link">Saltar al contenido principal</a>
 
   <div id="app-content" tabindex="-1" class="app-content"></div>
-
 
   <footer class="footer-main">
     © <span id="year"></span> Papelería
@@ -71,8 +80,8 @@
     <button type="button" class="qty-btn" onclick="stepCantidad(1)" aria-label="Aumentar cantidad">+</button>
   </div>
   <div class="actions">
-    <button class="btn" onclick="confirmAddQuantity()">Agregar</button>
-    <button class="btn btn-cancel" onclick="closeModalCantidad()">Cancelar</button>
+   <button class="btn" onclick="confirmAddQuantity()" data-i18n="modals.add">Agregar</button>
+   <button class="btn btn-cancel" onclick="closeModalCantidad()" data-i18n="modals.cancel">Cancelar</button>
   </div>
 </div>
 
@@ -109,7 +118,7 @@
   <div class="u-flex-center u-gap-md u-mt-md">
     <button class="btn" id="btnPlay360"  onclick="startSpin()" aria-pressed="true">Reproducir</button>
     <button class="btn secondary" id="btnPause360" onclick="stopSpin()" aria-pressed="false">Pausar</button>
-    <button class="btn btn-cancel" onclick="closeModal360()">Cerrar</button>
+    <button class="btn btn-cancel" onclick="closeModal360()" data-i18n="modals.close">Cerrar</button>
   </div>
   <p class="u-text-center u-text-sm u-text-muted">(Vista 360 provisional)</p>
 </div>
@@ -121,15 +130,18 @@
 <div id="modalAuth" class="modal modal-narrow" aria-hidden="true" role="dialog" aria-modal="true" aria-label="Acceso a tu cuenta">
   
   <div id="auth-login-view">
-    <h3>Ingresar a tu Cuenta</h3>
-    <label for="authLoginEmail" class="sr-only">Correo electrónico</label>
-    <input id="authLoginEmail" type="email" placeholder="Correo electrónico" class="form-input" />
-    <label for="authLoginPass" class="sr-only">Contraseña</label>
-    <input id="authLoginPass" type="password" placeholder="Contraseña" class="form-input" />
-    <button class="btn btn-block" onclick="ejecutarLoginPublico()">Iniciar Sesión</button>
-    <p class="auth-switch">
-      ¿No tienes cuenta? <a href="#" class="auth-switch-link" onclick="event.preventDefault(); cambiarVistaAuth('registro')">Regístrate aquí</a>
-    </p>
+   <h3 data-i18n="auth.login_title">Ingresar a tu Cuenta</h3>
+   <label for="authLoginEmail" class="sr-only">Correo electrónico</label>
+   <input id="authLoginEmail" type="email" data-i18n-placeholder="auth.email_placeholder" placeholder="Correo electrónico" class="form-input" />
+  
+   <label for="authLoginPass" class="sr-only">Contraseña</label>
+   <input id="authLoginPass" type="password" data-i18n-placeholder="auth.pass_placeholder" placeholder="Contraseña" class="form-input" />
+  
+   <button class="btn btn-block" onclick="ejecutarLoginPublico()" data-i18n="auth.login_btn">Iniciar Sesión</button>
+  
+   <p class="auth-switch">
+    <span data-i18n="auth.no_account">¿No tienes cuenta?</span> <a href="#" class="auth-switch-link" onclick="event.preventDefault(); cambiarVistaAuth('registro')" data-i18n="auth.register_link">Regístrate aquí</a>
+   </p>
   </div>
 
   <div id="auth-register-view" class="u-hidden">
@@ -147,7 +159,7 @@
   </div>
 
   <div class="actions u-mt-md">
-    <button class="btn btn-cancel" onclick="cerrarModalAuth()">Cerrar</button>
+    <button class="btn btn-cancel" onclick="cerrarModalAuth()" data-i18n="modals.close">Cerrar</button>
   </div>
   <p id="authModalMsg" class="form-msg is-error"></p>
 </div>

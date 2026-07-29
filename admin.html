@@ -8,6 +8,8 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@500;600;700&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
   <script src="theme.js"></script>
+  <!-- SCRIPT DE IDIOMAS INYECTADO AQUÍ -->
+  <script src="i18n.js"></script>
   <link rel="stylesheet" href="styles.css?v=8">
 </head>
 <body class="admin-body">
@@ -18,11 +20,19 @@
         <img src="papeleria.jpeg" alt="Logo">
       </div>
       <div>
-        <div class="brand-title u-text-bold">Gestión de Tienda</div>
-        <div class="brand-subtitle u-text-sm">Papelería El Profe — Admin</div>
+        <div class="brand-title u-text-bold" data-i18n="admin.header_title">Gestión de Tienda</div>
+        <div class="brand-subtitle u-text-sm" data-i18n="admin.header_subtitle">Papelería El Profe — Admin</div>
       </div>
     </div>
     <nav class="nav-right">
+      <!-- SELECTOR DE IDIOMAS -->
+      <select id="langSelector" class="form-input" style="width: auto; padding: 6px; margin: 0; cursor: pointer;" onchange="changeLanguage(event)">
+        <option value="es">ES</option>
+        <option value="en">EN</option>
+        <option value="fr">FR</option>
+        <option value="zh">ZH</option>
+      </select>
+
       <button
         id="themeToggleBtn"
         class="theme-toggle"
@@ -30,16 +40,13 @@
         aria-label="Cambiar a modo oscuro"
         title="Cambiar tema"
       >🌙</button>
-      <button id="btnLogout" class="btn danger u-hidden" onclick="logoutAdmin()">Cerrar sesión</button>
-      <a href="index.php" class="btn secondary">Ver Tienda</a>
+      <button id="btnLogout" class="btn danger u-hidden" onclick="logoutAdmin()" data-i18n="admin.logout">Cerrar sesión</button>
+      <a href="index.php" class="btn secondary" data-i18n="admin.view_store">Ver Tienda</a>
     </nav>
   </header>
 
   <div class="admin-main">
 
-    <!-- ESTADO DE CARGA: se muestra mientras se verifica si ya hay
-         sesión de admin activa, para no parpadear el login antes de
-         saltar al dashboard. -->
     <div id="checkingSession" class="admin-card admin-checking-card">
       Verificando sesión...
     </div>
@@ -60,17 +67,17 @@
 
       <div class="admin-card">
         <div class="u-flex-between u-mb-md">
-          <h2 class="u-no-margin">📦 Inventario de Productos</h2>
-          <button class="btn" onclick="openNewProductModal()">+ Nuevo producto</button>
+          <h2 class="u-no-margin" data-i18n="admin.inventory">📦 Inventario de Productos</h2>
+          <button class="btn" onclick="openNewProductModal()" data-i18n="admin.new_product">+ Nuevo producto</button>
         </div>
         <table id="adminProductsTable" class="admin-table">
           <caption class="sr-only">Inventario de productos, con precio, stock y acciones disponibles</caption>
           <thead>
             <tr>
-              <th scope="col">Nombre</th>
-              <th scope="col">Precio</th>
-              <th scope="col">Stock</th>
-              <th scope="col">Acciones</th>
+              <th scope="col" data-i18n="admin.table_name">Nombre</th>
+              <th scope="col" data-i18n="admin.table_price">Precio</th>
+              <th scope="col" data-i18n="admin.table_stock">Stock</th>
+              <th scope="col" data-i18n="admin.table_actions">Acciones</th>
             </tr>
           </thead>
           <tbody></tbody>

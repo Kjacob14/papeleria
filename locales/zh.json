@@ -1,0 +1,56 @@
+{
+  "nav": {
+    "home": "首页",
+    "catalog": "目录",
+    "login": "登录",
+    "search": "搜索产品...",
+    "brand_title": "文具店",
+    "brand_subtitle": "学习用品和办公用品"
+  },
+  "home": {
+    "welcome": "欢迎来到 El Profe 文具店！",
+    "subtitle": "以最优惠的价格提供学习用品和办公用品。",
+    "view_catalog": "查看完整目录",
+    "popular": "⭐ 学校最受欢迎",
+    "packages": "🎒 特别套餐"
+  },
+  "catalog": {
+    "title": "完整目录",
+    "add_btn": "添加",
+    "out_of_stock": "缺货"
+  },
+  "cart": {
+    "title": "背包",
+    "empty": "您尚未添加任何产品。",
+    "total": "总计：",
+    "checkout": "确认订单"
+  },
+  "modals": {
+    "qty_title": "多少件",
+    "add": "添加",
+    "cancel": "取消",
+    "close": "关闭"
+  },
+  "auth": {
+    "login_title": "登录您的账户",
+    "email_placeholder": "电子邮件",
+    "pass_placeholder": "密码",
+    "login_btn": "登录",
+    "no_account": "没有账户？",
+    "register_link": "在此注册"
+  },
+  "admin": {
+    "header_title": "店铺管理",
+    "header_subtitle": "El Profe 文具店 — 管理员",
+    "logout": "登出",
+    "view_store": "查看店铺",
+    "inventory": "📦 产品库存",
+    "new_product": "+ 新产品",
+    "table_name": "名称",
+    "table_price": "价格",
+    "table_stock": "库存",
+    "table_actions": "操作",
+    "btn_edit": "编辑",
+    "btn_delete": "删除"
+  }
+}

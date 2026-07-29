@@ -1,0 +1,56 @@
+{
+  "nav": {
+    "home": "Accueil",
+    "catalog": "Catalogue",
+    "login": "Se connecter",
+    "search": "Rechercher un produit...",
+    "brand_title": "Papeterie",
+    "brand_subtitle": "Fournitures scolaires et matériel de bureau"
+  },
+  "home": {
+    "welcome": "Bienvenue à la Papeterie El Profe !",
+    "subtitle": "Fournitures scolaires et matériel de bureau au meilleur prix.",
+    "view_catalog": "Voir le catalogue complet",
+    "popular": "⭐ Les plus populaires à l'école",
+    "packages": "🎒 Forfaits Spéciaux"
+  },
+  "catalog": {
+    "title": "Catalogue complet",
+    "add_btn": "Ajouter",
+    "out_of_stock": "Rupture de stock"
+  },
+  "cart": {
+    "title": "Sac à dos",
+    "empty": "Vous n'avez pas encore ajouté de produits.",
+    "total": "Total :",
+    "checkout": "Confirmer la commande"
+  },
+  "modals": {
+    "qty_title": "Combien d'unités de",
+    "add": "Ajouter",
+    "cancel": "Annuler",
+    "close": "Fermer"
+  },
+  "auth": {
+    "login_title": "Connectez-vous à votre compte",
+    "email_placeholder": "E-mail",
+    "pass_placeholder": "Mot de passe",
+    "login_btn": "Se connecter",
+    "no_account": "Vous n'avez pas de compte ?",
+    "register_link": "Inscrivez-vous ici"
+  },
+  "admin": {
+    "header_title": "Gestion de la boutique",
+    "header_subtitle": "Papeterie El Profe — Admin",
+    "logout": "Déconnexion",
+    "view_store": "Voir la boutique",
+    "inventory": "📦 Inventaire des produits",
+    "new_product": "+ Nouveau produit",
+    "table_name": "Nom",
+    "table_price": "Prix",
+    "table_stock": "Stock",
+    "table_actions": "Actions",
+    "btn_edit": "Modifier",
+    "btn_delete": "Supprimer"
+  }
+}

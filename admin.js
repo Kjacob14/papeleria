@@ -3,27 +3,22 @@ let products = [];
 let orders = [];
 let editingProductIndex = null;
 
-/**
- * Fase 6: escapa texto antes de insertarlo vía innerHTML (nombres de
- * producto, correos de pedidos). admin.js no comparte módulo con
- * app.js, así que se define aquí una copia equivalente de la función
- * que app.js ya usa para el mismo propósito.
- */
+/* ── HELPER i18n ── */
+function getDbText(texto) {
+  try {
+    if (typeof texto === 'string' && texto.startsWith('{')) {
+      const obj = JSON.parse(texto);
+      return obj[typeof currentLang !== 'undefined' ? currentLang : 'es'] || obj['es'] || '';
+    }
+  } catch (e) {}
+  return texto;
+}
+
 function escapeHtmlAdmin(s) {
   return String(s || '').replace(/[&<>"']/g, m =>
     ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[m]));
 }
 
-/**
- * Fase 3: el backend responde con códigos HTTP reales (400, 401, 404,
- * 409, etc.), no solo 200/500. Antes, cualquier código distinto de
- * 2xx hacía throw sin leer el cuerpo, así que mensajes de error como
- * "Producto no encontrado" nunca llegaban a mostrarse en el panel.
- * Ahora siempre se intenta leer el JSON (que siempre trae
- * { ok, error? }), sin importar el código HTTP. Solo se lanza una
- * excepción real si la respuesta no es JSON válido (fallo de
- * conexión genuino).
- */
 async function apiGet(action) {
   const res = await fetch(`${API}?action=${action}`);
   try {
@@ -84,17 +79,6 @@ async function logoutAdmin() {
   window.location.href = 'index.php';
 }
 
-/**
- * Fase 5: evita el doble inicio de sesión. Antes, un admin que ya
- * había iniciado sesión desde la tienda pública (index.php) era
- * redirigido a admin.html, pero esta página siempre mostraba el
- * formulario de login sin verificar si ya existía una sesión activa
- * en el servidor — obligando a escribir las credenciales dos veces.
- *
- * Ahora, al cargar admin.html, se pregunta primero al backend
- * (verificar_sesion) si ya hay sesión de admin activa. Si la hay, se
- * salta directo al dashboard; si no, se muestra el login normal.
- */
 async function verificarSesionActiva() {
   const login     = document.getElementById('loginSection');
   const dashboard = document.getElementById('dashboardSection');
@@ -114,8 +98,6 @@ async function verificarSesionActiva() {
       login.classList.remove('u-hidden');
     }
   } catch (e) {
-    // Fallo de conexión genuino: se cae al login normal, sin bloquear
-    // el acceso a la página.
     dashboard.classList.add('u-hidden');
     btnLogout.classList.add('u-hidden');
     login.classList.remove('u-hidden');
@@ -136,12 +118,7 @@ async function loadDashboardData() {
   }
 }
 
-/* ── MODAL ACCESIBLE (equivalente al de app.js) ──────────────
- * Fase 6: admin.js no comparte módulo con app.js, así que se replica
- * aquí la misma lógica de foco/trampa de Tab/Escape para que
- * modalProductEdit se comporte igual que los modales del sitio
- * público.
- */
+/* ── MODAL ACCESIBLE ────────────────────────────── */
 let elementoAntesDelModalAdmin = null;
 let modalActivoIdAdmin = null;
 
@@ -209,8 +186,10 @@ function openNewProductModal() {
 function openEditProductModal(index) {
   editingProductIndex = index;
   const p = products[index];
+  
+  // Aquí usamos getDbText para que al editar un producto veas el JSON completo si existe
   document.getElementById('prodModalTitle').textContent = 'Editar producto';
-  document.getElementById('prodName').value = p.nombre;
+  document.getElementById('prodName').value = p.nombre; 
   document.getElementById('prodPrice').value = p.precio;
   document.getElementById('prodStock').value = p.stock;
   document.getElementById('prodImage').value = p.imagen;
@@ -237,10 +216,6 @@ async function saveProductFromModal() {
       const p = products[editingProductIndex];
       const payload = { id: p.id, nombre: name, precio: price, stock: stock, imagen: img, variantes: p.variantes };
       const res = await apiPost('editar_producto', payload);
-      // Fase 3: el backend ahora valida (producto existente, precio
-      // válido, etc.) y puede rechazar la edición. Antes se asumía
-      // éxito siempre; ahora se revisa res.ok antes de actualizar
-      // el estado local, para no desincronizar la tabla del admin.
       if (!res.ok) {
         msg.textContent = res.error || 'Error al guardar los cambios';
         return;
@@ -264,7 +239,7 @@ async function saveProductFromModal() {
 
 async function deleteProduct(index) {
   const p = products[index];
-  if (!confirm(`¿Eliminar "${p.nombre}"?`)) return;
+  if (!confirm(`¿Eliminar "${getDbText(p.nombre)}"?`)) return;
   try {
     const res = await apiPost('eliminar_producto', { id: p.id });
     if (!res.ok) {
@@ -283,14 +258,21 @@ function renderAdminProductsTable() {
   const tbody = document.querySelector('#adminProductsTable tbody');
   tbody.innerHTML = '';
   products.forEach((p, i) => {
+    // Usamos getDbText para traducir el nombre del producto en la tabla
+    const nombre = getDbText(p.nombre);
+    
+    // Traducimos los botones "Editar" y "Eliminar" de la tabla
+    const btnEdit = typeof t === 'function' ? t('admin.btn_edit') : 'Editar';
+    const btnDelete = typeof t === 'function' ? t('admin.btn_delete') : 'Eliminar';
+
     const tr = document.createElement('tr');
     tr.innerHTML = `
-      <td>${escapeHtmlAdmin(p.nombre)}</td>
+      <td>${escapeHtmlAdmin(nombre)}</td>
       <td>$${Number(p.precio).toFixed(2)}</td>
       <td>${p.stock}</td>
       <td>
-        <button class="btn btn-compact" onclick="openEditProductModal(${i})" aria-label="Editar ${escapeHtmlAdmin(p.nombre)}">Editar</button>
-        <button class="btn btn-cancel btn-compact danger" onclick="deleteProduct(${i})" aria-label="Eliminar ${escapeHtmlAdmin(p.nombre)}">Eliminar</button>
+        <button class="btn btn-compact" onclick="openEditProductModal(${i})" aria-label="Editar ${escapeHtmlAdmin(nombre)}">${btnEdit}</button>
+        <button class="btn btn-cancel btn-compact danger" onclick="deleteProduct(${i})" aria-label="Eliminar ${escapeHtmlAdmin(nombre)}">${btnDelete}</button>
       </td>`;
     tbody.appendChild(tr);
   });
@@ -315,3 +297,8 @@ function renderOrdersList() {
 
 /* ── INICIALIZACIÓN ──────────────────────────────────────── */
 document.addEventListener('DOMContentLoaded', verificarSesionActiva);
+
+/* ── EVENTO DE CAMBIO DE IDIOMA ── */
+document.addEventListener('languageChanged', () => {
+  renderAdminProductsTable();
+});

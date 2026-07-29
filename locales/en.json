@@ -1,0 +1,56 @@
+{
+  "nav": {
+    "home": "Home",
+    "catalog": "Catalog",
+    "login": "Login",
+    "search": "Search product...",
+    "brand_title": "Stationery",
+    "brand_subtitle": "School supplies and office materials"
+  },
+  "home": {
+    "welcome": "Welcome to El Profe Stationery!",
+    "subtitle": "School supplies and office materials at the best price.",
+    "view_catalog": "View Full Catalog",
+    "popular": "⭐ Most Popular at School",
+    "packages": "🎒 Special Packages"
+  },
+  "catalog": {
+    "title": "Full Catalog",
+    "add_btn": "Add",
+    "out_of_stock": "Out of stock"
+  },
+  "cart": {
+    "title": "Backpack",
+    "empty": "You haven't added any products yet.",
+    "total": "Total:",
+    "checkout": "Checkout"
+  },
+  "modals": {
+    "qty_title": "How many units of",
+    "add": "Add",
+    "cancel": "Cancel",
+    "close": "Close"
+  },
+  "auth": {
+    "login_title": "Log into your Account",
+    "email_placeholder": "Email",
+    "pass_placeholder": "Password",
+    "login_btn": "Login",
+    "no_account": "Don't have an account?",
+    "register_link": "Register here"
+  },
+  "admin": {
+    "header_title": "Store Management",
+    "header_subtitle": "El Profe Stationery — Admin",
+    "logout": "Logout",
+    "view_store": "View Store",
+    "inventory": "📦 Product Inventory",
+    "new_product": "+ New product",
+    "table_name": "Name",
+    "table_price": "Price",
+    "table_stock": "Stock",
+    "table_actions": "Actions",
+    "btn_edit": "Edit",
+    "btn_delete": "Delete"
+  }
+}

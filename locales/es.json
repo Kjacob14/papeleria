@@ -1,0 +1,54 @@
+{
+  "nav": {
+    "home": "Inicio",
+    "catalog": "Catálogo",
+    "login": "Iniciar Sesión",
+    "search": "Buscar producto..."
+  },
+  "home": {
+    "welcome": "¡Bienvenido a Papelería El Profe!",
+    "subtitle": "Útiles escolares y material de oficina al mejor precio.",
+    "view_catalog": "Ver Catálogo Completo",
+    "popular": "⭐ Lo Más Pedido en la Escuela"
+  },
+  "catalog": {
+    "title": "Catálogo Completo",
+    "add_btn": "Agregar",
+    "out_of_stock": "Sin stock"
+  },
+  "cart": {
+    "title": "Mochilita",
+    "empty": "Aún no has agregado productos.",
+    "total": "Total:",
+    "checkout": "Confirmar Pedido"
+  },
+
+  "modals": {
+    "qty_title": "¿Cuántas unidades de",
+    "add": "Agregar",
+    "cancel": "Cancelar",
+    "close": "Cerrar"
+  },
+  "auth": {
+    "login_title": "Ingresar a tu Cuenta",
+    "email_placeholder": "Correo electrónico",
+    "pass_placeholder": "Contraseña",
+    "login_btn": "Iniciar Sesión",
+    "no_account": "¿No tienes cuenta?",
+    "register_link": "Regístrate aquí"
+  },
+  "admin": {
+    "header_title": "Gestión de Tienda",
+    "header_subtitle": "Papelería El Profe — Admin",
+    "logout": "Cerrar sesión",
+    "view_store": "Ver Tienda",
+    "inventory": "📦 Inventario de Productos",
+    "new_product": "+ Nuevo producto",
+    "table_name": "Nombre",
+    "table_price": "Precio",
+    "table_stock": "Stock",
+    "table_actions": "Acciones",
+    "btn_edit": "Editar",
+    "btn_delete": "Eliminar"
+  }
+}
