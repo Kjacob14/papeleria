@@ -78,6 +78,37 @@ function getDbText(texto) {
   return texto;
 }
 
+/* ── HELPER MONEDA ── */
+function formatPrice(mxnPrice) {
+  const lang = typeof currentLang !== 'undefined' ? currentLang : 'es';
+  
+  // 1. Tasas de cambio (Simuladas: 1 Peso Mexicano equivale a...)
+  const rates = {
+    'es': 1,       // MXN
+    'en': 0.05,    // USD (Aprox 20 pesos = 1 dólar)
+    'fr': 0.045,   // EUR (Aprox 22 pesos = 1 euro)
+    'zh': 0.36     // CNY (Aprox 2.7 pesos = 1 yuan)
+  };
+  
+  // 2. Configuración regional y códigos de moneda
+  const config = {
+    'es': { locale: 'es-MX', currency: 'MXN' },
+    'en': { locale: 'en-US', currency: 'USD' },
+    'fr': { locale: 'fr-FR', currency: 'EUR' },
+    'zh': { locale: 'zh-CN', currency: 'CNY' }
+  };
+
+  // Convertir el precio base (MXN) a la moneda seleccionada
+  const convertedPrice = mxnPrice * (rates[lang] || 1);
+  const currentConfig = config[lang] || config['es'];
+
+  // Formatear nativamente con el símbolo correcto ($, €, ¥)
+  return new Intl.NumberFormat(currentConfig.locale, {
+    style: 'currency',
+    currency: currentConfig.currency
+  }).format(convertedPrice);
+}
+
 /* ── AUTENTICACIÓN ───────────────────────────────────────── */
 function abrirModalAuth(vista = 'login') {
   document.getElementById('authModalMsg').classList.remove('is-visible');
@@ -220,8 +251,8 @@ function renderCatalog(customList = null) {
        <img class="thumb" src="${escapeHtml(p.imagen)}" alt="${escapeHtml(getDbText(p.nombre))}" loading="lazy" onerror="handleImgError(this,'${escapeHtml(getDbText(p.nombre))}')" />
        <div class="item-info">
         <h3>${escapeHtml(getDbText(p.nombre))}</h3>
-        <div class="price">$${Number(p.precio).toFixed(2)}</div>
-        <div class="u-text-sm u-text-muted">Stock: ${p.stock ?? 0}</div>
+        <div class="price">${formatPrice(p.precio)}</div>
+        <div class="u-text-sm u-text-muted">${typeof t === 'function' ? t('catalog.stock') : 'Stock:'} ${p.stock ?? 0}</div>
         ${variantesHTML}
       </div>
       <div class="u-flex-center u-gap-sm u-mt-sm">
@@ -259,7 +290,7 @@ function renderCart() {
     const li = document.createElement('li');
     li.className = 'cart-line';
     li.innerHTML = `
-        <span>${escapeHtml(getDbText(item.nombre))} x${item.cantidad} — $${(item.precio * item.cantidad).toFixed(2)}</span>      <span class="u-flex u-gap-xs">
+        <span>${escapeHtml(getDbText(item.nombre))} x${item.cantidad} — ${formatPrice(item.precio * item.cantidad)}</span> <span class="u-flex u-gap-xs">
         <button class="btn btn-icon-sm" onclick="changeQuantity(${i},-1)">−</button>
         <button class="btn btn-icon-sm" onclick="changeQuantity(${i}, 1)">+</button>
         <button class="btn btn-cancel btn-icon-sm" onclick="removeItem(${i})">✕</button>
@@ -267,7 +298,7 @@ function renderCart() {
     lista.appendChild(li);
   });
 
-  if (total) total.textContent = `${totalText} $${sum.toFixed(2)}`;
+  if (total) total.textContent = `${totalText} ${formatPrice(sum)}`;
 }
 
 /* ── COMBOS ──────────────────────────────────────────────── */
@@ -289,7 +320,7 @@ function buildComboCard(c) {
       <img class="thumb" src="${escapeHtml(c.imagen)}" alt="${escapeHtml(getDbText(c.nombre))}" loading="lazy" onerror="handleImgError(this,'${escapeHtml(getDbText(c.nombre))}')" />
       <h3>${escapeHtml(getDbText(c.nombre))}</h3>
       <p class="u-text-sm u-text-muted">${escapeHtml(getDbText(c.descripcion))}</p>
-      <div class="price">$${Number(c.precio).toFixed(2)}</div>
+      <div class="price">${formatPrice(c.precio)}</div>
       <div class="actions">
         <button class="btn" onclick="agregarCombo(${c.id},'${escapeHtml(c.nombre)}',${c.precio})">${typeof t === 'function' ? t('catalog.add_btn') : 'Agregar'}</button>
       </div>
@@ -422,7 +453,7 @@ function showToast(msg = 'Hecho', ms = 2200) {
 
 /* ── TICKET / PEDIDOS ────────────────────────────────────── */
 function openTicketModal(metodoPago = "No especificado") {
-  const resumen = cart.map(p => `${p.nombre} x${p.cantidad} — $${(p.precio * p.cantidad).toFixed(2)}`).join('<br>');
+  const resumen = cart.map(p => `${getDbText(p.nombre)} x${p.cantidad} — ${formatPrice(p.precio * p.cantidad)}`).join('<br>');
   const total   = cart.reduce((t, p) => t + p.precio * p.cantidad, 0).toFixed(2);
   let extraHTML = '';
 
@@ -569,7 +600,7 @@ function confirmarPedido() {
 
   const { box, cerrar } = crearDialogoFlotante('Confirmar pedido', `
     <h3>¿Confirmar pedido? 🛍️</h3>
-    <p>Total: <b>$${cart.reduce((t,p)=>t+p.precio*p.cantidad,0).toFixed(2)}</b></p>
+    <p>Total: <b>${formatPrice(cart.reduce((t,p)=>t+p.precio*p.cantidad,0))}</b></p>
     <div class="actions">
       <button id="confirmYes" class="btn">Sí, confirmar</button>
       <button id="confirmNo"  class="btn secondary">Cancelar</button>
@@ -696,7 +727,12 @@ function close360View(e) {
 function speakText(text) {
   if ('speechSynthesis' in window) {
     const u = new SpeechSynthesisUtterance(text);
-    u.lang = 'es-MX'; u.rate = 1; u.pitch = 1;
+    
+    // Mapeo de voz según el idioma actual de la app
+    const voiceLangMap = { 'es': 'es-MX', 'en': 'en-US', 'fr': 'fr-FR', 'zh': 'zh-CN' };
+    u.lang = voiceLangMap[currentLang] || 'es-MX';
+    
+    u.rate = 1; u.pitch = 1;
     window.speechSynthesis.cancel();
     window.speechSynthesis.speak(u);
   }
@@ -708,7 +744,8 @@ function setupSpeechRecognition() {
   if (!('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)) return;
   const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
   recognition = new SR();
-  recognition.lang = 'es-MX';
+  const langMap = { 'es': 'es-MX', 'en': 'en-US', 'fr': 'fr-FR', 'zh': 'zh-CN' };
+recognition.lang = langMap[currentLang] || 'es-MX';
   recognition.interimResults = false;
   recognition.maxAlternatives = 1;
 
@@ -745,52 +782,132 @@ function processAssistantMessage(msg) {
   const numMatch = lower.match(/\d+/);
   const cantidad = numMatch ? parseInt(numMatch[0]) : 1;
 
-  const addWords    = ["agrega","añade","pon","mete","quiero","agregar"];
-  const searchWords = ["buscar","tienes","hay","mostrar","ver","muéstrame"];
+  // ── Diccionario de Respuestas del Bot ──
+  const botResponses = {
+    'es': {
+      hello: ["¡Hola! ¿En qué te ayudo hoy?", "¡Hola! ¿Qué se te ofrece?"],
+      price: "Puedo consultar precios. ¿De qué producto?",
+      schedule: "Lun-Vie 7:00-22:00 • Sáb-Dom 10:00-21:30",
+      address: "Av. Rincón del álamo, Villa de Almoloya de Juárez, México",
+      phone: "Tel: 722-518-1849",
+      thanks: "¡Con gusto! 😊",
+      fallback: "No entendí muy bien 🤔 ¿Podrías repetirlo?",
+      notFound: "No encontré ese producto.",
+      found: "Encontré estos productos:\n",
+      noStock: "No quedan unidades de",
+      added: "agregado(s) a tu mochilita",
+      cartItems1: "Tienes",
+      cartItems2: "artículo(s) en tu mochilita."
+    },
+    'en': {
+      hello: ["Hello! How can I help you today?", "Hi there! What do you need?"],
+      price: "I can check prices. Which product?",
+      schedule: "Mon-Fri 7:00 AM - 10:00 PM • Sat-Sun 10:00 AM - 9:30 PM",
+      address: "Av. Rincón del álamo, Villa de Almoloya de Juárez, Mexico",
+      phone: "Phone: 722-518-1849",
+      thanks: "You're welcome! 😊",
+      fallback: "I didn't quite catch that 🤔 Could you repeat it?",
+      notFound: "I couldn't find that product.",
+      found: "I found these products:\n",
+      noStock: "No units left of",
+      added: "added to your backpack",
+      cartItems1: "You have",
+      cartItems2: "item(s) in your backpack."
+    },
+    'fr': {
+      hello: ["Bonjour ! Comment puis-je vous aider ?", "Salut ! De quoi avez-vous besoin ?"],
+      price: "Je peux vérifier les prix. Quel produit ?",
+      schedule: "Lun-Ven 7h00-22h00 • Sam-Dim 10h00-21h30",
+      address: "Av. Rincón del álamo, Villa de Almoloya de Juárez, Mexique",
+      phone: "Tél : 722-518-1849",
+      thanks: "Avec plaisir ! 😊",
+      fallback: "Je n'ai pas très bien compris 🤔 Pouvez-vous répéter ?",
+      notFound: "Je n'ai pas trouvé ce produit.",
+      found: "J'ai trouvé ces produits :\n",
+      noStock: "Il ne reste plus de",
+      added: "ajouté(s) à votre sac à dos",
+      cartItems1: "Vous avez",
+      cartItems2: "article(s) dans votre sac à dos."
+    },
+    'zh': {
+      hello: ["你好！今天有什么我可以帮您的吗？", "嗨！您需要什么？"],
+      price: "我可以查询价格。请问是什么产品？",
+      schedule: "周一至周五 7:00-22:00 • 周六至周日 10:00-21:30",
+      address: "墨西哥阿尔莫洛亚德华雷斯，林孔德尔阿拉莫大道",
+      phone: "电话：722-518-1849",
+      thanks: "不客气！😊",
+      fallback: "我不太明白 🤔 您能重复一遍吗？",
+      notFound: "没有找到该产品。",
+      found: "我找到了这些产品：\n",
+      noStock: "没有库存了：",
+      added: "已添加到您的背包",
+      cartItems1: "您的背包里有",
+      cartItems2: "件商品。"
+    }
+  };
+
+  // Determinar idioma actual y seleccionar diccionario
+  const lang = (typeof currentLang !== 'undefined' && botResponses[currentLang]) ? currentLang : 'es';
+  const dict = botResponses[lang];
+
+  // ── Palabras clave de intención multilingües ──
+  const addWords    = ["agrega", "añade", "pon", "mete", "quiero", "agregar", "add", "ajouter", "添加", "加入"];
+  const searchWords = ["buscar", "tienes", "hay", "mostrar", "ver", "muéstrame", "search", "show", "find", "chercher", "trouver", "montrer", "查找", "搜索", "看"];
+  
   const isAdd    = addWords.some(w => lower.includes(w));
   const isSearch = searchWords.some(w => lower.includes(w));
 
-  const matches = products.filter(p =>
-    lower.includes(p.nombre.toLowerCase().split(" ")[0]) ||
-    p.nombre.toLowerCase().includes(lower)
-  );
+  // ── Búsqueda de Productos (usando getDbText para leer el JSON) ──
+  const matches = products.filter(p => {
+    const translatedName = getDbText(p.nombre).toLowerCase();
+    return lower.includes(translatedName.split(" ")[0]) || translatedName.includes(lower);
+  });
 
   if (isAdd && matches.length > 0) {
     const prod = matches[0];
     const cant = Math.min(cantidad, prod.stock);
+    const translatedProdName = getDbText(prod.nombre);
+    
     if (cant <= 0) {
-      const r = `No quedan unidades de ${prod.nombre}`;
+      const r = `${dict.noStock} ${translatedProdName}`;
       addAssistantBotMessage(r); speakText(r); return;
     }
+    
     const existe = cart.find(i => i.id === prod.id && i.tipo === '');
     if (existe) existe.cantidad += cant;
     else cart.push({ id: prod.id, nombre: prod.nombre, precio: prod.precio, cantidad: cant, tipo: '' });
+    
     prod.stock -= cant;
     renderCatalog(); renderCart();
-    const r = `${cant} ${prod.nombre} agregado(s) a tu mochilita`;
+    
+    const r = `${cant} ${translatedProdName} ${dict.added}`;
     addAssistantBotMessage(r); speakText(r); return;
   }
 
   if (isSearch || matches.length > 0) {
     if (matches.length > 0) {
-      let r = "Encontré estos productos:\n";
-      matches.forEach(p => { r += `• ${p.nombre} — $${p.precio} (${p.stock} disponibles)\n`; });
+      let r = dict.found;
+      matches.forEach(p => { 
+        // Usamos formatPrice para internacionalizar la moneda
+        const priceFormatted = typeof formatPrice === 'function' ? formatPrice(p.precio) : `$${p.precio}`;
+        r += `• ${getDbText(p.nombre)} — ${priceFormatted} (Stock: ${p.stock})\n`; 
+      });
       addAssistantBotMessage(r); speakText(r);
     } else {
-      const r = "No encontré ese producto.";
-      addAssistantBotMessage(r); speakText(r);
+      addAssistantBotMessage(dict.notFound); speakText(dict.notFound);
     }
     return;
   }
 
+  // ── Reglas de Preguntas Frecuentes Multilingües ──
   const rules = [
-    { keywords: ["hola","buenas","hey"],          reply: "¡Hola! ¿En qué te ayudo hoy?" },
-    { keywords: ["precio","cuesta","valor"],       reply: "Puedo consultar precios. ¿De qué producto?" },
-    { keywords: ["horario","hora","abierto"],      reply: "Lun-Vie 7:00-22:00 • Sáb-Dom 10:00-21:30" },
-    { keywords: ["dirección","dónde","ubicación"], reply: "Av. Rincón del álamo, Villa de Almoloya de Juárez, México" },
-    { keywords: ["teléfono","tel","número"],       reply: "Tel: 722-518-1849" },
-    { keywords: ["gracias","thank"],              reply: "¡Con gusto! 😊" },
-    { keywords: ["pedido","carrito","mochilita"], reply: `Tienes ${cart.reduce((s,i)=>s+i.cantidad,0)} artículo(s) en tu mochilita.` },
+    { keywords: ["hola", "buenas", "hey", "hello", "hi", "bonjour", "salut", "你好", "嗨"], reply: dict.hello[Math.floor(Math.random() * dict.hello.length)] },
+    { keywords: ["precio", "cuesta", "valor", "price", "cost", "prix", "combien", "价格", "多少钱"], reply: dict.price },
+    { keywords: ["horario", "hora", "abierto", "schedule", "hours", "open", "horaires", "ouvert", "时间", "营业"], reply: dict.schedule },
+    { keywords: ["dirección", "dónde", "ubicación", "address", "where", "location", "adresse", "où", "地址", "在哪"], reply: dict.address },
+    { keywords: ["teléfono", "tel", "número", "phone", "number", "téléphone", "电话", "号码"], reply: dict.phone },
+    { keywords: ["gracias", "thank", "merci", "谢谢"], reply: dict.thanks },
+    { keywords: ["pedido", "carrito", "mochilita", "cart", "order", "backpack", "commande", "panier", "订单", "购物车", "背包"], reply: `${dict.cartItems1} ${cart.reduce((s,i)=>s+i.cantidad,0)} ${dict.cartItems2}` },
   ];
 
   for (const rule of rules) {
@@ -799,8 +916,7 @@ function processAssistantMessage(msg) {
     }
   }
 
-  const fallback = "No entendí muy bien 🤔 ¿Podrías repetirlo?";
-  addAssistantBotMessage(fallback); speakText(fallback);
+  addAssistantBotMessage(dict.fallback); speakText(dict.fallback);
 }
 
 /* ── SETUP ───────────────────────────────────────────────── */
@@ -821,9 +937,56 @@ function setupFloatingButtons() {
     box.setAttribute('aria-hidden', 'false');
     document.getElementById('chatbotBtn').setAttribute('aria-expanded', 'true');
     const voiceBtn = document.getElementById('voiceBtn');
-    if (!recognition) { addAssistantBotMessage('Tu navegador no soporta reconocimiento de voz.'); return; }
-    if (recognizing) { recognition.stop(); voiceBtn.setAttribute('aria-pressed', 'false'); showToast('Grabación detenida'); }
-    else             { recognition.start(); voiceBtn.setAttribute('aria-pressed', 'true'); showToast('Escuchando... 🎤'); }
+    
+    if (!recognition) { 
+      addAssistantBotMessage(typeof t === 'function' ? t('assistant.no_support') : 'Sin soporte de voz.'); 
+      return; 
+    }
+    
+    if (recognizing) { 
+      recognition.stop(); 
+      voiceBtn.setAttribute('aria-pressed', 'false'); 
+      showToast(typeof t === 'function' ? t('assistant.stopped') : 'Grabación detenida'); 
+    } else { 
+      recognition.start(); 
+      voiceBtn.setAttribute('aria-pressed', 'true'); 
+      showToast(typeof t === 'function' ? t('assistant.listening') : 'Escuchando... 🎤'); 
+    }
+  });
+}
+
+/* ── ATAJOS DE TECLADO GLOBALES ── */
+function setupKeyboardShortcuts() {
+  document.addEventListener('keydown', (e) => {
+    // 1. Evitar que los atajos se activen si el usuario está escribiendo en un input
+    const isTyping = e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA';
+
+    // 2. Abrir el modal de ayuda con '?' (Shift + /)
+    if (e.key === '?' && !isTyping) {
+      e.preventDefault();
+      showModal('modalShortcuts');
+    }
+
+    // 3. Enfocar el buscador con Ctrl + K (o Cmd + K en Mac)
+    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+      e.preventDefault(); // Evita el comportamiento por defecto del navegador
+      const searchBox = document.getElementById('searchBox');
+      if (searchBox) {
+        searchBox.focus();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    }
+
+    // 4. Ir a la mochilita con la letra 'M'
+    if (e.key.toLowerCase() === 'm' && !isTyping && !e.ctrlKey && !e.metaKey) {
+      window.location.hash = '#mochilita';
+    }
+
+    // 5. Activar asistente de voz con la letra 'V'
+    if (e.key.toLowerCase() === 'v' && !isTyping && !e.ctrlKey && !e.metaKey) {
+      const voiceBtn = document.getElementById('voiceBtn');
+      if (voiceBtn) voiceBtn.click();
+    }
   });
 }
 
@@ -834,11 +997,16 @@ function setupAssistantBox() {
     box.setAttribute('aria-hidden', 'true');
     document.getElementById('chatbotBtn').setAttribute('aria-expanded', 'false');
   });
+  
   document.getElementById('assistantVoiceBtn').addEventListener('click', () => {
-    if (!recognition) { addAssistantBotMessage('Sin soporte de voz.'); return; }
+    if (!recognition) { 
+      addAssistantBotMessage(typeof t === 'function' ? t('assistant.no_support') : 'Sin soporte de voz.'); 
+      return; 
+    }
     if (recognizing) recognition.stop();
     else             recognition.start();
   });
+  
   document.getElementById('assistantSendBtn').addEventListener('click', () => {
     const txt = document.getElementById('assistantInput').value.trim();
     if (!txt) return;
@@ -846,6 +1014,7 @@ function setupAssistantBox() {
     document.getElementById('assistantInput').value = '';
     processAssistantMessage(txt);
   });
+  
   document.getElementById('assistantInput').addEventListener('keypress', e => {
     if (e.key === 'Enter') document.getElementById('assistantSendBtn').click();
   });
@@ -903,11 +1072,11 @@ function router() {
       const idx = products.indexOf(p);
       return `
         <div class="item u-relative">
-          <div class="card-badge">⭐ Popular</div>
+          <div class="card-badge">${typeof t === 'function' ? t('home.popular_badge') : '⭐ Popular'}</div>
           <img class="thumb" src="${escapeHtml(p.imagen)}" alt="${escapeHtml(getDbText(p.nombre))}" loading="lazy" onerror="handleImgError(this,'${escapeHtml(getDbText(p.nombre))}')" />
           <h3>${escapeHtml(getDbText(p.nombre))}</h3>
-          <div class="price">$${Number(p.precio).toFixed(2)}</div>
-          <div class="u-text-sm u-text-muted u-mb-md">Stock: ${p.stock ?? 0}</div>
+          <div class="price">${formatPrice(p.precio)}</div>
+          <div class="u-text-sm u-text-muted u-mb-md">${typeof t === 'function' ? t('catalog.stock') : 'Stock:'} ${p.stock ?? 0}</div>
           <button class="btn" onclick="openModalCantidad(${idx})" ${p.stock <= 0 ? 'disabled' : ''}>
             ${p.stock <= 0 ? (typeof t === 'function' ? t('catalog.out_of_stock') : 'Sin stock') : (typeof t === 'function' ? t('catalog.add_btn') : 'Agregar')}
           </button>
@@ -1005,6 +1174,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   setupAssistantBox();
   setupFloatingButtons();
   setupViewerDrag();
+  setupKeyboardShortcuts();
 });
 
 /* ── EVENTO DE CAMBIO DE IDIOMA ── */

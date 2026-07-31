@@ -902,3 +902,30 @@ body.admin-body {
 .admin-table td { padding: 12px 14px; text-align: left; border-bottom: 1px solid var(--border); }
 .admin-table tbody tr:hover { background: var(--surface-2); }
 #ordersList > div:last-child { border-bottom: none; }
+
+/* --- Estilos para las teclas de atajos (<kbd>) --- */
+kbd {
+    background-color: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    box-shadow: 0 2px 0 var(--border);
+    color: var(--text);
+    display: inline-block;
+    font-size: 12px;
+    font-weight: 700;
+    padding: 3px 8px;
+    font-family: monospace;
+    margin: 0 2px;
+}
+.shortcuts-list {
+    list-style: none;
+    padding: 0;
+    margin: 15px 0;
+}
+.shortcuts-list li {
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+}
+.shortcuts-list li:last-child {
+    border-bottom: none;
+}

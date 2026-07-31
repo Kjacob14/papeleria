@@ -12,12 +12,14 @@
     "subtitle": "Fournitures scolaires et matériel de bureau au meilleur prix.",
     "view_catalog": "Voir le catalogue complet",
     "popular": "⭐ Les plus populaires à l'école",
-    "packages": "🎒 Forfaits Spéciaux"
+    "packages": "🎒 Forfaits Spéciaux",
+    "popular_badge": "⭐ Populaire"
   },
   "catalog": {
     "title": "Catalogue complet",
     "add_btn": "Ajouter",
-    "out_of_stock": "Rupture de stock"
+    "out_of_stock": "Rupture de stock",
+    "stock": "Stock :"
   },
   "cart": {
     "title": "Sac à dos",
@@ -52,5 +54,13 @@
     "table_actions": "Actions",
     "btn_edit": "Modifier",
     "btn_delete": "Supprimer"
+  },
+  "assistant": {
+    "title": "🤖 Assistant El Profe",
+    "close": "✕",
+    "placeholder": "Tapez votre question...",
+    "listening": "Écoute... 🎤",
+    "stopped": "Enregistrement arrêté",
+    "no_support": "Votre navigateur ne supporte pas la reconnaissance vocale."
   }
 }

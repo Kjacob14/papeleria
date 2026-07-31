@@ -164,16 +164,44 @@
   <p id="authModalMsg" class="form-msg is-error"></p>
 </div>
 
+<!-- Modal de Atajos de Teclado -->
+<div id="modalShortcuts" class="modal modal-narrow" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="shortcutsTitle">
+  <div class="u-flex-between u-mb-md">
+    <h3 id="shortcutsTitle" class="u-no-margin" data-i18n="modals.shortcuts_title">Atajos de Teclado</h3>
+    <kbd>?</kbd>
+  </div>
+  <ul class="shortcuts-list">
+    <li class="u-flex-between">
+      <span data-i18n="modals.short_search">Buscar producto</span> 
+      <span><kbd>Ctrl</kbd> + <kbd>K</kbd></span>
+    </li>
+    <li class="u-flex-between">
+      <span data-i18n="modals.short_cart">Ver Mochilita</span> 
+      <kbd>M</kbd>
+    </li>
+    <li class="u-flex-between">
+      <span data-i18n="modals.short_voice">Asistente de Voz</span> 
+      <kbd>V</kbd>
+    </li>
+    <li class="u-flex-between">
+      <span data-i18n="modals.short_close">Cerrar ventanas</span> 
+      <kbd>Esc</kbd>
+    </li>
+  </ul>
+  <div class="actions u-mt-md">
+    <button class="btn btn-cancel btn-block" onclick="hideModal('modalShortcuts')" data-i18n="modals.close">Cerrar</button>
+  </div>
+</div>
 <!-- Panel flotante del asistente -->
 <div id="assistantBox" role="dialog" aria-label="Asistente El Profe" aria-hidden="true">
   <div class="mini-header">
-    <h4>🤖 Asistente El Profe</h4>
-    <button class="small-btn" id="assistantToggleBtn" aria-label="Cerrar asistente">Cerrar ✕</button>
+    <h4 data-i18n="assistant.title">🤖 Asistente El Profe</h4>
+    <button class="small-btn" id="assistantToggleBtn" aria-label="Cerrar asistente" data-i18n="assistant.close">✕</button>
   </div>
   <div id="assistantMessages" class="mini-body" role="log" aria-live="polite" aria-label="Conversación con el asistente"></div>
   <div id="assistantFooter" class="mini-footer">
     <label for="assistantInput" class="sr-only">Escribe tu pregunta para el asistente</label>
-    <input type="text" id="assistantInput" placeholder="Escribe tu pregunta..." aria-label="Escribe tu pregunta" />
+    <input type="text" id="assistantInput" data-i18n-placeholder="assistant.placeholder" placeholder="Escribe tu pregunta..." aria-label="Escribe tu pregunta" />
     <button class="small-btn" id="assistantSendBtn" aria-label="Enviar pregunta">↑</button>
     <button class="small-btn" id="assistantVoiceBtn" aria-label="Activar entrada de voz" aria-pressed="false">🎤</button>
   </div>

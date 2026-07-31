@@ -3,18 +3,23 @@
     "home": "Inicio",
     "catalog": "Catálogo",
     "login": "Iniciar Sesión",
-    "search": "Buscar producto..."
+    "search": "Buscar producto...",
+    "brand_title": "Papelería",
+    "brand_subtitle": "Útiles escolares y Material de oficina"
   },
   "home": {
     "welcome": "¡Bienvenido a Papelería El Profe!",
     "subtitle": "Útiles escolares y material de oficina al mejor precio.",
     "view_catalog": "Ver Catálogo Completo",
-    "popular": "⭐ Lo Más Pedido en la Escuela"
+    "popular": "⭐ Lo Más Pedido en la Escuela",
+    "packages": "🎒 Paquetes Especiales",
+    "popular_badge": "⭐ Popular"
   },
   "catalog": {
     "title": "Catálogo Completo",
     "add_btn": "Agregar",
-    "out_of_stock": "Sin stock"
+    "out_of_stock": "Sin stock",
+    "stock": "Stock:"
   },
   "cart": {
     "title": "Mochilita",
@@ -22,12 +27,16 @@
     "total": "Total:",
     "checkout": "Confirmar Pedido"
   },
-
   "modals": {
     "qty_title": "¿Cuántas unidades de",
     "add": "Agregar",
     "cancel": "Cancelar",
-    "close": "Cerrar"
+    "close": "Cerrar",
+    "shortcuts_title": "Atajos de Teclado",
+    "short_search": "Buscar producto",
+    "short_cart": "Ver Mochilita",
+    "short_voice": "Asistente de Voz",
+    "short_close": "Cerrar ventanas"
   },
   "auth": {
     "login_title": "Ingresar a tu Cuenta",
@@ -50,5 +59,13 @@
     "table_actions": "Acciones",
     "btn_edit": "Editar",
     "btn_delete": "Eliminar"
+  },
+  "assistant": {
+    "title": "🤖 Asistente El Profe",
+    "close": "✕",
+    "placeholder": "Escribe tu pregunta...",
+    "listening": "Escuchando... 🎤",
+    "stopped": "Grabación detenida",
+    "no_support": "Tu navegador no soporta reconocimiento de voz."
   }
 }

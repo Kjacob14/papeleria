@@ -12,12 +12,14 @@
     "subtitle": "以最优惠的价格提供学习用品和办公用品。",
     "view_catalog": "查看完整目录",
     "popular": "⭐ 学校最受欢迎",
-    "packages": "🎒 特别套餐"
+    "packages": "🎒 特别套餐",
+    "popular_badge": "⭐ 热门"
   },
   "catalog": {
     "title": "完整目录",
     "add_btn": "添加",
-    "out_of_stock": "缺货"
+    "out_of_stock": "缺货",
+    "stock": "库存:"
   },
   "cart": {
     "title": "背包",
@@ -52,5 +54,13 @@
     "table_actions": "操作",
     "btn_edit": "编辑",
     "btn_delete": "删除"
+  },
+  "assistant": {
+    "title": "🤖 El Profe 助手",
+    "close": "✕",
+    "placeholder": "输入您的问题...",
+    "listening": "正在聆听... 🎤",
+    "stopped": "录音停止",
+    "no_support": "您的浏览器不支持语音识别。"
   }
 }

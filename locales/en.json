@@ -12,12 +12,14 @@
     "subtitle": "School supplies and office materials at the best price.",
     "view_catalog": "View Full Catalog",
     "popular": "⭐ Most Popular at School",
-    "packages": "🎒 Special Packages"
+    "packages": "🎒 Special Packages",
+    "popular_badge": "⭐ Popular"
   },
   "catalog": {
     "title": "Full Catalog",
     "add_btn": "Add",
-    "out_of_stock": "Out of stock"
+    "out_of_stock": "Out of stock",
+    "stock": "Stock:"
   },
   "cart": {
     "title": "Backpack",
@@ -29,7 +31,12 @@
     "qty_title": "How many units of",
     "add": "Add",
     "cancel": "Cancel",
-    "close": "Close"
+    "close": "Close",
+    "shortcuts_title": "Keyboard Shortcuts",
+    "short_search": "Search product",
+    "short_cart": "View Backpack",
+    "short_voice": "Voice Assistant",
+    "short_close": "Close windows"
   },
   "auth": {
     "login_title": "Log into your Account",
@@ -52,5 +59,13 @@
     "table_actions": "Actions",
     "btn_edit": "Edit",
     "btn_delete": "Delete"
+  },
+  "assistant": {
+    "title": "🤖 El Profe Assistant",
+    "close": "✕",
+    "placeholder": "Type your question...",
+    "listening": "Listening... 🎤",
+    "stopped": "Recording stopped",
+    "no_support": "Your browser does not support voice recognition."
   }
 }
