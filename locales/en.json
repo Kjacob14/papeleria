@@ -5,7 +5,9 @@
     "login": "Login",
     "search": "Search product...",
     "brand_title": "Stationery",
-    "brand_subtitle": "School supplies and office materials"
+    "brand_subtitle": "School supplies and office materials",
+    "hello": "Hi,",
+    "logout": "Log out"
   },
   "home": {
     "welcome": "Welcome to El Profe Stationery!",
@@ -25,7 +27,41 @@
     "title": "Backpack",
     "empty": "You haven't added any products yet.",
     "total": "Total:",
-    "checkout": "Checkout"
+    "checkout": "Checkout",
+    "added_to_cart": "added to your backpack",
+    "combo_added": "added to your backpack",
+    "removed_from_cart": "removed from your backpack.",
+    "removed": "removed.",
+    "no_more_units": "No more units available of",
+    "only_available": "Only",
+    "units_available": "units available.",
+    "ticket_sent_to": "Ticket sent to",
+    "order_connection_error": "Could not connect to the server. Please try again.",
+    "order_register_error": "Could not register the order:",
+    "unknown_error": "unknown error",
+    "ticket_sent_order_connection_error": "Ticket sent, but could not connect to the server to register the order.",
+    "ticket_sent_order_register_error": "Ticket sent, but the order could not be registered:"
+  },
+  "checkout": {
+    "empty_cart": "Your backpack is empty",
+    "login_required": "Log in to confirm your order",
+    "confirm_title": "Confirm order?",
+    "confirm_total": "Total:",
+    "confirm_yes": "Yes, confirm",
+    "confirm_cancel": "Cancel",
+    "order_cancelled": "Order cancelled",
+    "payment_title": "Payment method",
+    "payment_cash": "Cash",
+    "payment_card": "Card",
+    "payment_transfer": "Bank transfer",
+    "payment_cancelled": "Payment cancelled",
+    "cash_note": "Customer will pay in cash",
+    "card_note": "Payment by credit card",
+    "transfer_note": "Bank transfer",
+    "email_prompt": "Enter a valid email",
+    "email_send_error": "Error sending email. Order saved anyway.",
+    "order_success": "Order registered successfully",
+    "no_stock": "Out of stock"
   },
   "modals": {
     "qty_title": "How many units of",
@@ -56,7 +92,10 @@
     "account_created": "Account created! Logging in...",
     "pass_requirements": "Password must be at least 8 characters, including letters and numbers.",
     "invalid_credentials": "Invalid credentials.",
-    "create_account_error": "Error creating account."
+    "create_account_error": "Error creating account.",
+    "logged_out": "You have logged out.",
+    "welcome_back": "Welcome back,",
+    "welcome": "Welcome"
   },
   "admin": {
     "header_title": "Store Management",

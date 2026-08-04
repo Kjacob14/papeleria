@@ -5,7 +5,9 @@
     "login": "登录",
     "search": "搜索产品...",
     "brand_title": "文具店",
-    "brand_subtitle": "学习用品和办公用品"
+    "brand_subtitle": "学习用品和办公用品",
+    "hello": "你好，",
+    "logout": "退出"
   },
   "home": {
     "welcome": "欢迎来到 El Profe 文具店！",
@@ -25,7 +27,41 @@
     "title": "背包",
     "empty": "您尚未添加任何产品。",
     "total": "总计：",
-    "checkout": "确认订单"
+    "checkout": "确认订单",
+    "added_to_cart": "已添加到您的背包",
+    "combo_added": "已添加到您的背包",
+    "removed_from_cart": "已从背包中移除。",
+    "removed": "已移除。",
+    "no_more_units": "没有更多库存：",
+    "only_available": "仅剩",
+    "units_available": "件可用。",
+    "ticket_sent_to": "小票已发送至",
+    "order_connection_error": "无法连接到服务器，请重试。",
+    "order_register_error": "无法登记订单：",
+    "unknown_error": "未知错误",
+    "ticket_sent_order_connection_error": "小票已发送，但无法连接到服务器登记订单。",
+    "ticket_sent_order_register_error": "小票已发送，但订单无法登记："
+  },
+  "checkout": {
+    "empty_cart": "您的背包是空的",
+    "login_required": "请登录以确认您的订单",
+    "confirm_title": "确认订单？",
+    "confirm_total": "总计：",
+    "confirm_yes": "是，确认",
+    "confirm_cancel": "取消",
+    "order_cancelled": "订单已取消",
+    "payment_title": "支付方式",
+    "payment_cash": "现金",
+    "payment_card": "银行卡",
+    "payment_transfer": "银行转账",
+    "payment_cancelled": "支付已取消",
+    "cash_note": "顾客将以现金支付",
+    "card_note": "使用信用卡支付",
+    "transfer_note": "银行转账",
+    "email_prompt": "请输入有效的电子邮件",
+    "email_send_error": "发送邮件时出错。订单仍已保存。",
+    "order_success": "订单登记成功",
+    "no_stock": "缺货"
   },
   "modals": {
     "qty_title": "多少件",
@@ -51,7 +87,10 @@
     "account_created": "账户已创建！正在登录...",
     "pass_requirements": "密码必须至少包含8个字符，包括字母和数字。",
     "invalid_credentials": "凭据无效。",
-    "create_account_error": "创建账户时出错。"
+    "create_account_error": "创建账户时出错。",
+    "logged_out": "您已退出登录。",
+    "welcome_back": "欢迎回来，",
+    "welcome": "欢迎"
   },
   "admin": {
     "header_title": "店铺管理",

@@ -5,7 +5,9 @@
     "login": "Se connecter",
     "search": "Rechercher un produit...",
     "brand_title": "Papeterie",
-    "brand_subtitle": "Fournitures scolaires et matériel de bureau"
+    "brand_subtitle": "Fournitures scolaires et matériel de bureau",
+    "hello": "Bonjour,",
+    "logout": "Se déconnecter"
   },
   "home": {
     "welcome": "Bienvenue à la Papeterie El Profe !",
@@ -25,7 +27,41 @@
     "title": "Sac à dos",
     "empty": "Vous n'avez pas encore ajouté de produits.",
     "total": "Total :",
-    "checkout": "Confirmer la commande"
+    "checkout": "Confirmer la commande",
+    "added_to_cart": "ajouté(s) à votre sac à dos",
+    "combo_added": "ajouté à votre sac à dos",
+    "removed_from_cart": "retiré du sac à dos.",
+    "removed": "retiré.",
+    "no_more_units": "Il ne reste plus d'unités de",
+    "only_available": "Il ne reste que",
+    "units_available": "unités disponibles.",
+    "ticket_sent_to": "Ticket envoyé à",
+    "order_connection_error": "Impossible de se connecter au serveur. Réessayez.",
+    "order_register_error": "Impossible d'enregistrer la commande :",
+    "unknown_error": "erreur inconnue",
+    "ticket_sent_order_connection_error": "Ticket envoyé, mais impossible de se connecter au serveur pour enregistrer la commande.",
+    "ticket_sent_order_register_error": "Ticket envoyé, mais la commande n'a pas pu être enregistrée :"
+  },
+  "checkout": {
+    "empty_cart": "Votre sac à dos est vide",
+    "login_required": "Connectez-vous pour confirmer votre commande",
+    "confirm_title": "Confirmer la commande ?",
+    "confirm_total": "Total :",
+    "confirm_yes": "Oui, confirmer",
+    "confirm_cancel": "Annuler",
+    "order_cancelled": "Commande annulée",
+    "payment_title": "Méthode de paiement",
+    "payment_cash": "Espèces",
+    "payment_card": "Carte",
+    "payment_transfer": "Virement bancaire",
+    "payment_cancelled": "Paiement annulé",
+    "cash_note": "Le client paiera en espèces",
+    "card_note": "Paiement par carte de crédit",
+    "transfer_note": "Virement bancaire",
+    "email_prompt": "Entrez un e-mail valide",
+    "email_send_error": "Erreur lors de l'envoi de l'e-mail. Commande enregistrée quand même.",
+    "order_success": "Commande enregistrée avec succès",
+    "no_stock": "Rupture de stock"
   },
   "modals": {
     "qty_title": "Combien d'unités de",
@@ -51,7 +87,10 @@
     "account_created": "Compte créé ! Connexion en cours...",
     "pass_requirements": "Le mot de passe doit contenir au moins 8 caractères, avec des lettres et des chiffres.",
     "invalid_credentials": "Identifiants incorrects.",
-    "create_account_error": "Erreur lors de la création du compte."
+    "create_account_error": "Erreur lors de la création du compte.",
+    "logged_out": "Vous avez été déconnecté.",
+    "welcome_back": "Content de vous revoir,",
+    "welcome": "Bienvenue"
   },
   "admin": {
     "header_title": "Gestion de la boutique",

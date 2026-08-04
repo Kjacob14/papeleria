@@ -142,7 +142,7 @@ async function ejecutarLoginPublico() {
       usuarioActivo = { id: data.id, nombre: data.nombre, rol: data.rol };
       cerrarModalAuth();
       actualizarNavbarUsuario();
-      showToast(`¡Bienvenido de nuevo, ${data.nombre}! 👋`);
+      showToast(`${typeof t === 'function' ? t('auth.welcome_back') : '¡Bienvenido de nuevo,'} ${data.nombre}! 👋`);
     } else {
       msg.textContent = data.error || (typeof t === 'function' ? t('auth.invalid_credentials') : 'Credenciales incorrectas.');
       msg.className = 'form-msg is-error is-visible';
@@ -190,7 +190,7 @@ async function ejecutarRegistroPublico() {
           usuarioActivo = { id: loginData.id, nombre: loginData.nombre, rol: loginData.rol };
           cerrarModalAuth();
           actualizarNavbarUsuario();
-          showToast(`¡Bienvenido ${loginData.nombre}!`);
+          showToast(`${typeof t === 'function' ? t('auth.welcome') : '¡Bienvenido'} ${loginData.nombre}!`);
         }
       }, 1200);
     } else {
@@ -208,8 +208,8 @@ function actualizarNavbarUsuario() {
   if (!container) return;
   if (usuarioActivo) {
     container.innerHTML = `
-      <span class="u-text-bold u-mr-md">Hola, ${escapeHtml(usuarioActivo.nombre.split(' ')[0])}</span>
-      <button class="btn danger btn-icon-sm" onclick="cerrarSesionPublica()">Salir</button>`;
+      <span class="u-text-bold u-mr-md">${typeof t === 'function' ? t('nav.hello') : 'Hola,'} ${escapeHtml(usuarioActivo.nombre.split(' ')[0])}</span>
+      <button class="btn danger btn-icon-sm" onclick="cerrarSesionPublica()">${typeof t === 'function' ? t('nav.logout') : 'Salir'}</button>`;
   } else {
     container.innerHTML = `<button class="btn secondary" onclick="abrirModalAuth('login')" data-i18n="nav.login">${typeof t === 'function' ? t('nav.login') : 'Iniciar Sesión'}</button>`;
   }
@@ -218,7 +218,7 @@ function actualizarNavbarUsuario() {
 function cerrarSesionPublica() {
   usuarioActivo = null;
   actualizarNavbarUsuario();
-  showToast('Has cerrado sesión.');
+  showToast(typeof t === 'function' ? t('auth.logged_out') : 'Has cerrado sesión.');
   window.location.hash = '#inicio';
 }
 
@@ -329,7 +329,7 @@ function agregarCombo(id, nombre, precio) {
   if (existe) existe.cantidad += 1;
   else cart.push({ id, nombre, precio: Number(precio), cantidad: 1, tipo: 'Combo' });
   actualizarBadgeMochilita();
-  showToast(`¡${nombre} agregado a tu mochilita! 🎒`);
+  showToast(`¡${nombre} ${typeof t === 'function' ? t('cart.combo_added') : 'agregado a tu mochilita'}! 🎒`);
 }
 
 function buildComboCard(c) {
@@ -344,7 +344,7 @@ function buildComboCard(c) {
       <p class="u-text-sm u-text-muted">${escapeHtml(getDbText(c.descripcion))}</p>
       <div class="price">${formatPrice(c.precio)}</div>
       <div class="actions">
-        <button class="btn" onclick="agregarCombo(${c.id},'${escapeHtml(c.nombre)}',${c.precio})">${typeof t === 'function' ? t('catalog.add_btn') : 'Agregar'}</button>
+        <button class="btn" onclick="agregarCombo(${c.id},'${escapeHtml(getDbText(c.nombre))}',${c.precio})">${typeof t === 'function' ? t('catalog.add_btn') : 'Agregar'}</button>
       </div>
     </div>`;
 }
@@ -378,7 +378,7 @@ function setupCarousel(sliderId) {
 /* ── MODAL CANTIDAD ──────────────────────────────────────── */
 function openModalCantidad(index) {
   const p = products[index];
-  if (!p || p.stock <= 0) { showToast('Sin stock disponible'); return; }
+  if (!p || p.stock <= 0) { showToast(typeof t === 'function' ? t('checkout.no_stock') : 'Sin stock disponible'); return; }
   productToAddIndex = index;
   document.getElementById('mc-title').textContent = `${typeof t === 'function' ? t('modals.qty_title') : '¿Cuántas unidades de'} "${getDbText(p.nombre)}"?`;
   document.getElementById('mc-cantidad').value = 1;
@@ -403,7 +403,7 @@ function confirmAddQuantity() {
   const cantidad = parseInt(document.getElementById('mc-cantidad').value) || 1;
 
   if (cantidad < 1 || cantidad > p.stock) {
-    showToast(`Solo hay ${p.stock} unidades disponibles.`); return;
+    showToast(`${typeof t === 'function' ? t('cart.only_available') : 'Solo hay'} ${p.stock} ${typeof t === 'function' ? t('cart.units_available') : 'unidades disponibles.'}`); return;
   }
 
   const existe = cart.find(i => i.id === p.id && i.tipo === '');
@@ -414,7 +414,7 @@ function confirmAddQuantity() {
   renderCatalog();
   renderCart();
   hideModal('modalCantidad');
-  showToast(`${cantidad} × ${p.nombre} añadido(s) a tu mochilita`);
+  showToast(`${cantidad} × ${getDbText(p.nombre)} ${typeof t === 'function' ? t('cart.added_to_cart') : 'añadido(s) a tu mochilita'}`);
 }
 
 function removeItem(index) {
@@ -424,7 +424,7 @@ function removeItem(index) {
   cart.splice(index, 1);
   renderCatalog();
   renderCart();
-  showToast(`${item.nombre} eliminado de la mochilita.`);
+  showToast(`${getDbText(item.nombre)} ${typeof t === 'function' ? t('cart.removed_from_cart') : 'eliminado de la mochilita.'}`);
 }
 
 function changeQuantity(index, delta) {
@@ -432,7 +432,7 @@ function changeQuantity(index, delta) {
   const product = products.find(p => p.id === item.id);
 
   if (delta > 0 && product && product.stock <= 0 && item.tipo !== 'Combo') {
-    showToast(`Ya no hay más unidades de ${item.nombre}.`); return;
+    showToast(`${typeof t === 'function' ? t('cart.no_more_units') : 'Ya no hay más unidades de'} ${getDbText(item.nombre)}.`); return;
   }
 
   if (delta > 0) {
@@ -443,7 +443,7 @@ function changeQuantity(index, delta) {
     if (product && item.tipo !== 'Combo') product.stock++;
     if (item.cantidad <= 0) {
       cart.splice(index, 1);
-      showToast(`${item.nombre} eliminado.`);
+      showToast(`${getDbText(item.nombre)} ${typeof t === 'function' ? t('cart.removed') : 'eliminado.'}`);
     }
   }
 
@@ -479,9 +479,9 @@ function openTicketModal(metodoPago = "No especificado") {
   const total   = cart.reduce((t, p) => t + p.precio * p.cantidad, 0).toFixed(2);
   let extraHTML = '';
 
-  if (metodoPago === "Efectivo")             extraHTML = `<p class="u-mt-lg">Cliente pagará en efectivo</p>`;
-  else if (metodoPago === "Tarjeta")         extraHTML = `<p class="u-mt-lg">Pago con tarjeta de crédito</p>`;
-  else if (metodoPago === "Transferencia")   extraHTML = `<p class="u-mt-lg">Transferencia bancaria<br>Banco: BBVA | Cuenta: 1234 5678 9012 | CLABE: 012345678901234567</p>`;
+  if (metodoPago === "Efectivo")             extraHTML = `<p class="u-mt-lg">${typeof t === 'function' ? t('checkout.cash_note') : 'Cliente pagará en efectivo'}</p>`;
+  else if (metodoPago === "Tarjeta")         extraHTML = `<p class="u-mt-lg">${typeof t === 'function' ? t('checkout.card_note') : 'Pago con tarjeta de crédito'}</p>`;
+  else if (metodoPago === "Transferencia")   extraHTML = `<p class="u-mt-lg">${typeof t === 'function' ? t('checkout.transfer_note') : 'Transferencia bancaria'}<br>Banco: BBVA | Cuenta: 1234 5678 9012 | CLABE: 012345678901234567</p>`;
 
   document.getElementById('ticketItems').innerHTML = resumen + extraHTML;
   document.getElementById('ticketTotal').textContent = total;
@@ -504,16 +504,16 @@ async function finishTicketWithoutEmail() {
     data = await apiPost('guardar_pedido', order);
   } catch (e) {
     console.warn('Error de conexión guardando pedido:', e);
-    showToast('⚠️ No se pudo conectar con el servidor. Intenta de nuevo.');
+    showToast(`⚠️ ${typeof t === 'function' ? t('cart.order_connection_error') : 'No se pudo conectar con el servidor. Intenta de nuevo.'}`);
     return;
   }
 
   if (!data.ok) {
-    showToast(`⚠️ No se pudo registrar el pedido: ${data.error || 'error desconocido'}`);
+    showToast(`⚠️ ${typeof t === 'function' ? t('cart.order_register_error') : 'No se pudo registrar el pedido:'} ${data.error || (typeof t === 'function' ? t('cart.unknown_error') : 'error desconocido')}`);
     return;
   }
 
-  showToast('Pedido registrado con éxito');
+  showToast(typeof t === 'function' ? t('checkout.order_success') : 'Pedido registrado con éxito');
   cart = [];
   hideModal('modalTicket');
   renderCart();
@@ -523,7 +523,7 @@ async function finishTicketWithoutEmail() {
 
 async function sendTicketByEmail() {
   const correo = document.getElementById('ticketEmailInput').value.trim();
-  if (!correo) { alert('Ingresa un correo válido'); return; }
+  if (!correo) { alert(typeof t === 'function' ? t('checkout.email_prompt') : 'Ingresa un correo válido'); return; }
 
   let texto = 'Ticket de compra - Papelería El Profe\n\n';
   let total  = 0;
@@ -535,10 +535,10 @@ async function sendTicketByEmail() {
 
   try {
     await emailjs.send("service_8ijihn6", "template_us81s2k", { to_email: correo, message: texto });
-    showToast(`Ticket enviado a ${correo}`);
+    showToast(`${typeof t === 'function' ? t('cart.ticket_sent_to') : 'Ticket enviado a'} ${correo}`);
   } catch (err) {
     console.error(err);
-    alert('Error al enviar correo. Pedido guardado igualmente.');
+    alert(typeof t === 'function' ? t('checkout.email_send_error') : 'Error al enviar correo. Pedido guardado igualmente.');
   }
 
   const id    = 'PED-' + Date.now();
@@ -550,7 +550,7 @@ async function sendTicketByEmail() {
     data = await apiPost('guardar_pedido', order);
   } catch (e) {
     console.warn('Error de conexión guardando pedido:', e);
-    showToast('⚠️ Ticket enviado, pero no se pudo conectar con el servidor para registrar el pedido.');
+    showToast(`⚠️ ${typeof t === 'function' ? t('cart.ticket_sent_order_connection_error') : 'Ticket enviado, pero no se pudo conectar con el servidor para registrar el pedido.'}`);
     cart = [];
     hideModal('modalTicket');
     renderCart();
@@ -558,7 +558,7 @@ async function sendTicketByEmail() {
   }
 
   if (!data.ok) {
-    showToast(`⚠️ Ticket enviado, pero el pedido no se pudo registrar: ${data.error || 'error desconocido'}`);
+    showToast(`⚠️ ${typeof t === 'function' ? t('cart.ticket_sent_order_register_error') : 'Ticket enviado, pero el pedido no se pudo registrar:'} ${data.error || (typeof t === 'function' ? t('cart.unknown_error') : 'error desconocido')}`);
     cart = [];
     hideModal('modalTicket');
     renderCart();
@@ -612,40 +612,51 @@ function crearDialogoFlotante(etiqueta, innerHTML) {
 }
 
 function confirmarPedido() {
-  if (cart.length === 0) { showToast("Tu mochilita está vacía 👜"); return; }
+  if (cart.length === 0) { showToast(`${typeof t === 'function' ? t('checkout.empty_cart') : 'Tu mochilita está vacía'} 👜`); return; }
 
   if (!usuarioActivo) {
-    showToast('Inicia sesión para confirmar tu pedido 🔒');
+    showToast(`${typeof t === 'function' ? t('checkout.login_required') : 'Inicia sesión para confirmar tu pedido'} 🔒`);
     abrirModalAuth('login');
     return;
   }
 
-  const { box, cerrar } = crearDialogoFlotante('Confirmar pedido', `
-    <h3>¿Confirmar pedido? 🛍️</h3>
-    <p>Total: <b>${formatPrice(cart.reduce((t,p)=>t+p.precio*p.cantidad,0))}</b></p>
+  const confirmTitle = typeof t === 'function' ? t('checkout.confirm_title') : '¿Confirmar pedido?';
+  const confirmTotal  = typeof t === 'function' ? t('checkout.confirm_total') : 'Total:';
+  const confirmYes    = typeof t === 'function' ? t('checkout.confirm_yes') : 'Sí, confirmar';
+  const confirmCancel = typeof t === 'function' ? t('checkout.confirm_cancel') : 'Cancelar';
+
+  const { box, cerrar } = crearDialogoFlotante(confirmTitle, `
+    <h3>${confirmTitle} 🛍️</h3>
+    <p>${confirmTotal} <b>${formatPrice(cart.reduce((t,p)=>t+p.precio*p.cantidad,0))}</b></p>
     <div class="actions">
-      <button id="confirmYes" class="btn">Sí, confirmar</button>
-      <button id="confirmNo"  class="btn secondary">Cancelar</button>
+      <button id="confirmYes" class="btn">${confirmYes}</button>
+      <button id="confirmNo"  class="btn secondary">${confirmCancel}</button>
     </div>`);
 
   box.querySelector('#confirmYes').onclick = () => { cerrar(); seleccionarMetodoPago(); };
-  box.querySelector('#confirmNo').onclick  = () => { cerrar(); showToast("Pedido cancelado"); };
+  box.querySelector('#confirmNo').onclick  = () => { cerrar(); showToast(typeof t === 'function' ? t('checkout.order_cancelled') : 'Pedido cancelado'); };
 }
 
 function seleccionarMetodoPago() {
-  const { box, cerrar } = crearDialogoFlotante('Método de pago', `
-    <h3>Método de pago 💳</h3>
+  const paymentTitle     = typeof t === 'function' ? t('checkout.payment_title') : 'Método de pago';
+  const paymentCash      = typeof t === 'function' ? t('checkout.payment_cash') : 'Efectivo';
+  const paymentCard      = typeof t === 'function' ? t('checkout.payment_card') : 'Tarjeta';
+  const paymentTransfer  = typeof t === 'function' ? t('checkout.payment_transfer') : 'Transferencia';
+  const paymentCancel    = typeof t === 'function' ? t('checkout.confirm_cancel') : 'Cancelar';
+
+  const { box, cerrar } = crearDialogoFlotante(paymentTitle, `
+    <h3>${paymentTitle} 💳</h3>
     <div class="u-flex-center u-gap-md u-flex-wrap">
-      <button class="btn" id="pagoEfectivo">Efectivo</button>
-      <button class="btn" id="pagoTarjeta">Tarjeta</button>
-      <button class="btn" id="pagoTransferencia">Transferencia</button>
+      <button class="btn" id="pagoEfectivo">${paymentCash}</button>
+      <button class="btn" id="pagoTarjeta">${paymentCard}</button>
+      <button class="btn" id="pagoTransferencia">${paymentTransfer}</button>
     </div>
-    <button class="btn btn-cancel u-mt-md" id="pagoCancel">Cancelar</button>`);
+    <button class="btn btn-cancel u-mt-md" id="pagoCancel">${paymentCancel}</button>`);
 
   box.querySelector('#pagoEfectivo').onclick      = () => { cerrar(); openTicketModal("Efectivo"); };
   box.querySelector('#pagoTarjeta').onclick       = () => { cerrar(); openTicketModal("Tarjeta"); };
   box.querySelector('#pagoTransferencia').onclick = () => { cerrar(); openTicketModal("Transferencia"); };
-  box.querySelector('#pagoCancel').onclick        = () => { cerrar(); showToast("Pago cancelado"); };
+  box.querySelector('#pagoCancel').onclick        = () => { cerrar(); showToast(typeof t === 'function' ? t('checkout.payment_cancelled') : 'Pago cancelado'); };
 }
 
 /* ── MODAL HELPERS (accesibles) ────────────────────────────── */
@@ -1203,5 +1214,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 document.addEventListener('languageChanged', () => {
   renderCatalog();
   renderCart();
+  actualizarNavbarUsuario();
   router(); 
 });

@@ -5,7 +5,9 @@
     "login": "Iniciar Sesión",
     "search": "Buscar producto...",
     "brand_title": "Papelería",
-    "brand_subtitle": "Útiles escolares y Material de oficina"
+    "brand_subtitle": "Útiles escolares y Material de oficina",
+    "hello": "Hola,",
+    "logout": "Salir"
   },
   "home": {
     "welcome": "¡Bienvenido a Papelería El Profe!",
@@ -25,7 +27,41 @@
     "title": "Mochilita",
     "empty": "Aún no has agregado productos.",
     "total": "Total:",
-    "checkout": "Confirmar Pedido"
+    "checkout": "Confirmar Pedido",
+    "added_to_cart": "añadido(s) a tu mochilita",
+    "combo_added": "agregado a tu mochilita",
+    "removed_from_cart": "eliminado de la mochilita.",
+    "removed": "eliminado.",
+    "no_more_units": "Ya no hay más unidades de",
+    "only_available": "Solo hay",
+    "units_available": "unidades disponibles.",
+    "ticket_sent_to": "Ticket enviado a",
+    "order_connection_error": "No se pudo conectar con el servidor. Intenta de nuevo.",
+    "order_register_error": "No se pudo registrar el pedido:",
+    "unknown_error": "error desconocido",
+    "ticket_sent_order_connection_error": "Ticket enviado, pero no se pudo conectar con el servidor para registrar el pedido.",
+    "ticket_sent_order_register_error": "Ticket enviado, pero el pedido no se pudo registrar:"
+  },
+  "checkout": {
+    "empty_cart": "Tu mochilita está vacía",
+    "login_required": "Inicia sesión para confirmar tu pedido",
+    "confirm_title": "¿Confirmar pedido?",
+    "confirm_total": "Total:",
+    "confirm_yes": "Sí, confirmar",
+    "confirm_cancel": "Cancelar",
+    "order_cancelled": "Pedido cancelado",
+    "payment_title": "Método de pago",
+    "payment_cash": "Efectivo",
+    "payment_card": "Tarjeta",
+    "payment_transfer": "Transferencia",
+    "payment_cancelled": "Pago cancelado",
+    "cash_note": "Cliente pagará en efectivo",
+    "card_note": "Pago con tarjeta de crédito",
+    "transfer_note": "Transferencia bancaria",
+    "email_prompt": "Ingresa un correo válido",
+    "email_send_error": "Error al enviar correo. Pedido guardado igualmente.",
+    "order_success": "Pedido registrado con éxito",
+    "no_stock": "Sin stock disponible"
   },
   "modals": {
     "qty_title": "¿Cuántas unidades de",
@@ -56,7 +92,10 @@
     "account_created": "¡Cuenta creada! Iniciando sesión...",
     "pass_requirements": "La contraseña debe tener al menos 8 caracteres, incluyendo letras y números.",
     "invalid_credentials": "Credenciales incorrectas.",
-    "create_account_error": "Error al crear la cuenta."
+    "create_account_error": "Error al crear la cuenta.",
+    "logged_out": "Has cerrado sesión.",
+    "welcome_back": "¡Bienvenido de nuevo,",
+    "welcome": "¡Bienvenido"
   },
   "admin": {
     "header_title": "Gestión de Tienda",
