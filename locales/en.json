@@ -44,7 +44,19 @@
     "pass_placeholder": "Password",
     "login_btn": "Login",
     "no_account": "Don't have an account?",
-    "register_link": "Register here"
+    "register_link": "Register here",
+    "register_title": "Create an Account",
+    "name_placeholder": "Full name",
+    "reg_pass_placeholder": "At least 8 characters, with letters and numbers",
+    "register_btn": "Register",
+    "has_account": "Already have an account?",
+    "login_link": "Log in",
+    "fill_all_fields": "Fill in all fields.",
+    "connection_error": "Connection error with the server.",
+    "account_created": "Account created! Logging in...",
+    "pass_requirements": "Password must be at least 8 characters, including letters and numbers.",
+    "invalid_credentials": "Invalid credentials.",
+    "create_account_error": "Error creating account."
   },
   "admin": {
     "header_title": "Store Management",

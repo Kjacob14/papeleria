@@ -73,3 +73,32 @@
   // inmediato al original — parece que el botón "no hace nada").
   window.toggleTema = toggleTema;
 })();
+
+/* ============================================================
+   Toggle mostrar/ocultar contraseña — compartido entre
+   admin.html e index.php (login y registro).
+
+   Un solo ícono de ojo en SVG (trazo delgado, sin relleno) que
+   combina con el resto del sistema de diseño en vez de un emoji.
+   El "ojo tachado" es el mismo SVG con una línea diagonal extra
+   que se muestra u oculta con la clase .is-visible — no se
+   intercambian ícono por ícono.
+
+   Cualquier botón con [data-toggle-pass="idDelInput"] se conecta
+   automáticamente al cargar la página, así no hace falta repetir
+   la función para loginPass, authLoginPass y authRegPass.
+============================================================ */
+function setupPasswordToggles() {
+  document.querySelectorAll('[data-toggle-pass]').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      const input = document.getElementById(btn.getAttribute('data-toggle-pass'));
+      if (!input) return;
+      const oculto = input.type === 'password';
+      input.type = oculto ? 'text' : 'password';
+      btn.classList.toggle('is-visible', oculto);
+      btn.setAttribute('aria-label', oculto ? 'Ocultar contraseña' : 'Mostrar contraseña');
+    });
+  });
+}
+
+document.addEventListener('DOMContentLoaded', setupPasswordToggles);

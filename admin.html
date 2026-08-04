@@ -57,7 +57,16 @@
       <label for="loginUser" class="sr-only">Correo electrónico</label>
       <input id="loginUser" type="email" placeholder="Correo electrónico" class="form-input" />
       <label for="loginPass" class="sr-only">Contraseña</label>
-      <input id="loginPass" type="password" placeholder="Contraseña" class="form-input" />
+      <div class="password-field">
+        <input id="loginPass" type="password" placeholder="Contraseña" class="form-input" />
+        <button type="button" class="password-toggle-btn" data-toggle-pass="loginPass" aria-label="Mostrar contraseña">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M1.5 12S5 5 12 5s10.5 7 10.5 7-3.5 7-10.5 7S1.5 12 1.5 12Z"/>
+            <circle cx="12" cy="12" r="3"/>
+            <line class="icon-slash" x1="3" y1="3" x2="21" y2="21"/>
+          </svg>
+        </button>
+      </div>
       <button class="btn btn-block" onclick="doAdminLogin()">Ingresar al Panel</button>
       <p id="loginMsg" class="form-msg is-error" role="alert"></p>
     </div>

@@ -632,6 +632,48 @@ footer.footer-brand {
 .btn-icon-sm { padding: 4px 10px; font-size: 13px; }
 .btn-compact { padding: 8px 10px; font-size: 13px; }
 
+/* --- Toggle de visibilidad de contraseña ─────────────────────
+   Ícono de ojo minimalista dibujado en SVG (trazo, no emoji) para
+   que combine con la tipografía del resto del sistema y herede el
+   color de texto correcto en modo claro/oscuro vía currentColor. */
+.password-field {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+.password-field .form-input {
+    padding-right: 42px;
+}
+.password-toggle-btn {
+    position: absolute;
+    right: 8px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--text-muted);
+    padding: 0;
+}
+.password-toggle-btn:hover { color: var(--text); }
+.password-toggle-btn svg {
+    width: 19px;
+    height: 19px;
+    stroke: currentColor;
+    fill: none;
+    stroke-width: 1.6;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+/* La barra diagonal ("ocultar") solo se muestra cuando el input
+   está en modo texto; se controla agregando/quitando esta clase
+   en el botón, no intercambiando el SVG completo. */
+.password-toggle-btn .icon-slash { display: none; }
+.password-toggle-btn.is-visible .icon-slash { display: inline; }
+
 /* Mensajes de estado en formularios (login, registro, modal producto) */
 .form-msg {
     text-align: center;

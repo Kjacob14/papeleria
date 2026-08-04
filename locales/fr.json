@@ -39,7 +39,19 @@
     "pass_placeholder": "Mot de passe",
     "login_btn": "Se connecter",
     "no_account": "Vous n'avez pas de compte ?",
-    "register_link": "Inscrivez-vous ici"
+    "register_link": "Inscrivez-vous ici",
+    "register_title": "Créer un compte",
+    "name_placeholder": "Nom complet",
+    "reg_pass_placeholder": "8 caractères minimum, avec lettres et chiffres",
+    "register_btn": "S'inscrire",
+    "has_account": "Vous avez déjà un compte ?",
+    "login_link": "Connectez-vous",
+    "fill_all_fields": "Remplissez tous les champs.",
+    "connection_error": "Erreur de connexion avec le serveur.",
+    "account_created": "Compte créé ! Connexion en cours...",
+    "pass_requirements": "Le mot de passe doit contenir au moins 8 caractères, avec des lettres et des chiffres.",
+    "invalid_credentials": "Identifiants incorrects.",
+    "create_account_error": "Erreur lors de la création du compte."
   },
   "admin": {
     "header_title": "Gestion de la boutique",

@@ -39,7 +39,19 @@
     "pass_placeholder": "密码",
     "login_btn": "登录",
     "no_account": "没有账户？",
-    "register_link": "在此注册"
+    "register_link": "在此注册",
+    "register_title": "创建账户",
+    "name_placeholder": "全名",
+    "reg_pass_placeholder": "至少8个字符，包含字母和数字",
+    "register_btn": "注册",
+    "has_account": "已经有账户？",
+    "login_link": "登录",
+    "fill_all_fields": "请填写所有字段。",
+    "connection_error": "与服务器的连接错误。",
+    "account_created": "账户已创建！正在登录...",
+    "pass_requirements": "密码必须至少包含8个字符，包括字母和数字。",
+    "invalid_credentials": "凭据无效。",
+    "create_account_error": "创建账户时出错。"
   },
   "admin": {
     "header_title": "店铺管理",

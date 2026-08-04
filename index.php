@@ -135,7 +135,16 @@
    <input id="authLoginEmail" type="email" data-i18n-placeholder="auth.email_placeholder" placeholder="Correo electrónico" class="form-input" />
   
    <label for="authLoginPass" class="sr-only">Contraseña</label>
-   <input id="authLoginPass" type="password" data-i18n-placeholder="auth.pass_placeholder" placeholder="Contraseña" class="form-input" />
+   <div class="password-field">
+     <input id="authLoginPass" type="password" data-i18n-placeholder="auth.pass_placeholder" placeholder="Contraseña" class="form-input" />
+     <button type="button" class="password-toggle-btn" data-toggle-pass="authLoginPass" aria-label="Mostrar contraseña">
+       <svg viewBox="0 0 24 24" aria-hidden="true">
+         <path d="M1.5 12S5 5 12 5s10.5 7 10.5 7-3.5 7-10.5 7S1.5 12 1.5 12Z"/>
+         <circle cx="12" cy="12" r="3"/>
+         <line class="icon-slash" x1="3" y1="3" x2="21" y2="21"/>
+       </svg>
+     </button>
+   </div>
   
    <button class="btn btn-block" onclick="ejecutarLoginPublico()" data-i18n="auth.login_btn">Iniciar Sesión</button>
   
@@ -145,16 +154,25 @@
   </div>
 
   <div id="auth-register-view" class="u-hidden">
-    <h3>Crear una Cuenta</h3>
+    <h3 data-i18n="auth.register_title">Crear una Cuenta</h3>
     <label for="authRegNombre" class="sr-only">Nombre completo</label>
-    <input id="authRegNombre" type="text" placeholder="Nombre completo" class="form-input" />
+    <input id="authRegNombre" type="text" data-i18n-placeholder="auth.name_placeholder" placeholder="Nombre completo" class="form-input" />
     <label for="authRegEmail" class="sr-only">Correo electrónico</label>
-    <input id="authRegEmail" type="email" placeholder="Correo electrónico" class="form-input" />
+    <input id="authRegEmail" type="email" data-i18n-placeholder="auth.email_placeholder" placeholder="Correo electrónico" class="form-input" />
     <label for="authRegPass" class="sr-only">Contraseña</label>
-    <input id="authRegPass" type="password" placeholder="Contraseña" class="form-input" />
-    <button class="btn btn-block" onclick="ejecutarRegistroPublico()">Registrarse</button>
+    <div class="password-field">
+      <input id="authRegPass" type="password" minlength="8" data-i18n-placeholder="auth.reg_pass_placeholder" placeholder="Mínimo 8 caracteres, con letras y números" class="form-input" />
+      <button type="button" class="password-toggle-btn" data-toggle-pass="authRegPass" aria-label="Mostrar contraseña">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M1.5 12S5 5 12 5s10.5 7 10.5 7-3.5 7-10.5 7S1.5 12 1.5 12Z"/>
+          <circle cx="12" cy="12" r="3"/>
+          <line class="icon-slash" x1="3" y1="3" x2="21" y2="21"/>
+        </svg>
+      </button>
+    </div>
+    <button class="btn btn-block" onclick="ejecutarRegistroPublico()" data-i18n="auth.register_btn">Registrarse</button>
     <p class="auth-switch">
-      ¿Ya tienes cuenta? <a href="#" class="auth-switch-link" onclick="event.preventDefault(); cambiarVistaAuth('login')">Inicia sesión</a>
+      <span data-i18n="auth.has_account">¿Ya tienes cuenta?</span> <a href="#" class="auth-switch-link" onclick="event.preventDefault(); cambiarVistaAuth('login')" data-i18n="auth.login_link">Inicia sesión</a>
     </p>
   </div>
 

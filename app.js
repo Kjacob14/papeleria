@@ -129,7 +129,11 @@ async function ejecutarLoginPublico() {
   const pass   = document.getElementById('authLoginPass').value.trim();
   const msg    = document.getElementById('authModalMsg');
 
-  if (!correo || !pass) { msg.textContent = 'Completa todos los campos.'; msg.className = 'form-msg is-error is-visible'; return; }
+  if (!correo || !pass) {
+    msg.textContent = typeof t === 'function' ? t('auth.fill_all_fields') : 'Completa todos los campos.';
+    msg.className = 'form-msg is-error is-visible';
+    return;
+  }
 
   try {
     const data = await apiPost('login', { correo, contrasena: pass });
@@ -140,13 +144,21 @@ async function ejecutarLoginPublico() {
       actualizarNavbarUsuario();
       showToast(`¡Bienvenido de nuevo, ${data.nombre}! 👋`);
     } else {
-      msg.textContent = data.error || 'Credenciales incorrectas.';
+      msg.textContent = data.error || (typeof t === 'function' ? t('auth.invalid_credentials') : 'Credenciales incorrectas.');
       msg.className = 'form-msg is-error is-visible';
     }
   } catch (e) {
-    msg.textContent = 'Error de conexión con el servidor.';
+    msg.textContent = typeof t === 'function' ? t('auth.connection_error') : 'Error de conexión con el servidor.';
     msg.className = 'form-msg is-error is-visible';
   }
+}
+
+/* Contraseña válida: 8+ caracteres, con al menos una letra y un número.
+   Se revisa aquí (no solo con minlength en el HTML) porque el registro
+   se envía por fetch, no por un <form> nativo, así que la validación
+   del navegador nunca llega a bloquear el envío por sí sola. */
+function passwordEsValida(pass) {
+  return pass.length >= 8 && /[A-Za-z]/.test(pass) && /[0-9]/.test(pass);
 }
 
 async function ejecutarRegistroPublico() {
@@ -155,12 +167,22 @@ async function ejecutarRegistroPublico() {
   const pass   = document.getElementById('authRegPass').value.trim();
   const msg    = document.getElementById('authModalMsg');
 
-  if (!nombre || !correo || !pass) { msg.textContent = 'Completa todos los campos.'; msg.className = 'form-msg is-error is-visible'; return; }
+  if (!nombre || !correo || !pass) {
+    msg.textContent = typeof t === 'function' ? t('auth.fill_all_fields') : 'Completa todos los campos.';
+    msg.className = 'form-msg is-error is-visible';
+    return;
+  }
+
+  if (!passwordEsValida(pass)) {
+    msg.textContent = typeof t === 'function' ? t('auth.pass_requirements') : 'La contraseña debe tener al menos 8 caracteres, incluyendo letras y números.';
+    msg.className = 'form-msg is-error is-visible';
+    return;
+  }
 
   try {
     const data = await apiPost('crear_cuenta', { nombre, correo, contrasena: pass });
     if (data.ok) {
-      msg.textContent = '¡Cuenta creada! Iniciando sesión...';
+      msg.textContent = typeof t === 'function' ? t('auth.account_created') : '¡Cuenta creada! Iniciando sesión...';
       msg.className = 'form-msg is-success is-visible';
       setTimeout(async () => {
         const loginData = await apiPost('login', { correo, contrasena: pass });
@@ -172,11 +194,11 @@ async function ejecutarRegistroPublico() {
         }
       }, 1200);
     } else {
-      msg.textContent = data.error || 'Error al crear la cuenta.';
+      msg.textContent = data.error || (typeof t === 'function' ? t('auth.create_account_error') : 'Error al crear la cuenta.');
       msg.className = 'form-msg is-error is-visible';
     }
   } catch (e) {
-    msg.textContent = 'Error de conexión.';
+    msg.textContent = typeof t === 'function' ? t('auth.connection_error') : 'Error de conexión.';
     msg.className = 'form-msg is-error is-visible';
   }
 }

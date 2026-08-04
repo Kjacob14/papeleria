@@ -44,7 +44,19 @@
     "pass_placeholder": "Contraseña",
     "login_btn": "Iniciar Sesión",
     "no_account": "¿No tienes cuenta?",
-    "register_link": "Regístrate aquí"
+    "register_link": "Regístrate aquí",
+    "register_title": "Crear una Cuenta",
+    "name_placeholder": "Nombre completo",
+    "reg_pass_placeholder": "Mínimo 8 caracteres, con letras y números",
+    "register_btn": "Registrarse",
+    "has_account": "¿Ya tienes cuenta?",
+    "login_link": "Inicia sesión",
+    "fill_all_fields": "Completa todos los campos.",
+    "connection_error": "Error de conexión con el servidor.",
+    "account_created": "¡Cuenta creada! Iniciando sesión...",
+    "pass_requirements": "La contraseña debe tener al menos 8 caracteres, incluyendo letras y números.",
+    "invalid_credentials": "Credenciales incorrectas.",
+    "create_account_error": "Error al crear la cuenta."
   },
   "admin": {
     "header_title": "Gestión de Tienda",
